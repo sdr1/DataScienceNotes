@@ -29,14 +29,14 @@ format:
 
 First we're going to create a few datasets that we'll use to show what SQL can do
 
-```{r, intro, echo=FALSE}
+```{r, intro, echo=FALSE, message=FALSE}
 library(odbc)
 library(tidyverse)
 library(DBI)
 library(here)
 library(RSQLite)
 
-here::i_am("DataScienceNotes/SQL-published-version.qmd")
+here::i_am("SQL-published-version.qmd")
 ```
 
 ```{r create data, eval = T}
