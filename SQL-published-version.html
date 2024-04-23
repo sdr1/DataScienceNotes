@@ -149,41 +149,50 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <section id="preliminaries" class="level2">
 <h2 class="anchored" data-anchor-id="preliminaries">Preliminaries</h2>
-<p>First we’re going to create a few datasets that we’ll use to show what SQL can do</p>
+<p>First we’re going to create a few datasets using r. The majority of the tutorial doesn’t use them because the combination of SQL and Quarto is a bit buggy but it’s a useful exercise anyway.</p>
+<div class="cell" data-hash="SQL-published-version_cache/html/intro_cb13e0fa5e33e776998ee1a6b3b41be9">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(odbc)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(DBI)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(here)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(RSQLite)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>here<span class="sc">::</span><span class="fu">i_am</span>(<span class="st">"SQL-published-version.qmd"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
 <div class="cell" data-hash="SQL-published-version_cache/html/create data_3bc258576e930e6a7b5a32ee059e5ec7">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>sample_data <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">id =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">1000</span>,</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">x1 =</span> <span class="fu">rnorm</span>(<span class="dv">1000</span>, <span class="dv">0</span>, <span class="dv">1</span>),</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">x2 =</span> <span class="fu">rnorm</span>(<span class="dv">1000</span>, <span class="dv">10</span>, <span class="dv">15</span>),</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">y =</span> <span class="dv">3</span> <span class="sc">*</span> x1 <span class="sc">+</span> <span class="dv">4</span> <span class="sc">*</span> x2 <span class="sc">+</span> <span class="fu">rnorm</span>(<span class="dv">1000</span>, <span class="dv">0</span>, <span class="dv">10</span>),</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">g =</span> <span class="fu">rbinom</span>(<span class="dv">1000</span>, <span class="at">size =</span> <span class="dv">1</span>, <span class="at">prob =</span> <span class="fl">0.3</span>)</span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>sample_data2 <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">id =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">1000</span>,</span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">x3 =</span> <span class="fu">rnorm</span>(<span class="dv">1000</span>, <span class="dv">15</span>, <span class="dv">30</span>),</span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">x4 =</span> <span class="fu">rnorm</span>(<span class="dv">1000</span>, <span class="dv">20</span>, <span class="dv">5</span>),</span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">y2 =</span> <span class="dv">10</span> <span class="sc">*</span> x3 <span class="sc">+</span> <span class="dv">40</span> <span class="sc">*</span> x4 <span class="sc">+</span> <span class="fu">rnorm</span>(<span class="dv">1000</span>, <span class="dv">0</span>, <span class="dv">40</span>),</span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">g2 =</span> <span class="fu">rbinom</span>(<span class="dv">1000</span>, <span class="at">size =</span> <span class="dv">1</span>, <span class="at">prob =</span> <span class="fl">0.3</span>)</span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>mydb <span class="ot">&lt;-</span> <span class="fu">dbConnect</span>(RSQLite<span class="sc">::</span><span class="fu">SQLite</span>(), <span class="st">"sample.sqlite"</span>)</span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="fu">dbWriteTable</span>(<span class="at">conn =</span> mydb, <span class="at">name =</span> <span class="st">"sample"</span>, <span class="at">value =</span> sample_data, <span class="at">overwrite =</span> T)</span>
-<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="fu">dbWriteTable</span>(<span class="at">conn =</span> mydb, <span class="at">name =</span> <span class="st">"other_sample"</span>, <span class="at">value =</span> sample_data2, <span class="at">overwrite =</span> T)</span>
-<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a><span class="do">#### Try to load in postgresql - doesn't currently work</span></span>
-<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a><span class="co"># https://caltechlibrary.github.io/data-carpentry-R-ecology-lesson/05-r-and-databases.html</span></span>
-<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a><span class="co"># https://jtr13.github.io/cc21fall2/how-to-integrate-r-with-postgresql.html</span></span>
-<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a><span class="co"># https://solutions.posit.co/connections/db/databases/postgresql/</span></span>
-<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a><span class="co">#https://medium.com/geekculture/a-simple-guide-on-connecting-rstudio-to-a-postgresql-database-9e35ccdc08be</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>sample_data <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">id =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">1000</span>,</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">x1 =</span> <span class="fu">rnorm</span>(<span class="dv">1000</span>, <span class="dv">0</span>, <span class="dv">1</span>),</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">x2 =</span> <span class="fu">rnorm</span>(<span class="dv">1000</span>, <span class="dv">10</span>, <span class="dv">15</span>),</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">y =</span> <span class="dv">3</span> <span class="sc">*</span> x1 <span class="sc">+</span> <span class="dv">4</span> <span class="sc">*</span> x2 <span class="sc">+</span> <span class="fu">rnorm</span>(<span class="dv">1000</span>, <span class="dv">0</span>, <span class="dv">10</span>),</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">g =</span> <span class="fu">rbinom</span>(<span class="dv">1000</span>, <span class="at">size =</span> <span class="dv">1</span>, <span class="at">prob =</span> <span class="fl">0.3</span>)</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>sample_data2 <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">id =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">1000</span>,</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">x3 =</span> <span class="fu">rnorm</span>(<span class="dv">1000</span>, <span class="dv">15</span>, <span class="dv">30</span>),</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">x4 =</span> <span class="fu">rnorm</span>(<span class="dv">1000</span>, <span class="dv">20</span>, <span class="dv">5</span>),</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">y2 =</span> <span class="dv">10</span> <span class="sc">*</span> x3 <span class="sc">+</span> <span class="dv">40</span> <span class="sc">*</span> x4 <span class="sc">+</span> <span class="fu">rnorm</span>(<span class="dv">1000</span>, <span class="dv">0</span>, <span class="dv">40</span>),</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">g2 =</span> <span class="fu">rbinom</span>(<span class="dv">1000</span>, <span class="at">size =</span> <span class="dv">1</span>, <span class="at">prob =</span> <span class="fl">0.3</span>)</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>mydb <span class="ot">&lt;-</span> <span class="fu">dbConnect</span>(RSQLite<span class="sc">::</span><span class="fu">SQLite</span>(), <span class="st">"sample.sqlite"</span>)</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a><span class="fu">dbWriteTable</span>(<span class="at">conn =</span> mydb, <span class="at">name =</span> <span class="st">"sample"</span>, <span class="at">value =</span> sample_data, <span class="at">overwrite =</span> T)</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a><span class="fu">dbWriteTable</span>(<span class="at">conn =</span> mydb, <span class="at">name =</span> <span class="st">"other_sample"</span>, <span class="at">value =</span> sample_data2, <span class="at">overwrite =</span> T)</span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a><span class="do">#### Try to load in postgresql - doesn't currently work</span></span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a><span class="co"># https://caltechlibrary.github.io/data-carpentry-R-ecology-lesson/05-r-and-databases.html</span></span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a><span class="co"># https://jtr13.github.io/cc21fall2/how-to-integrate-r-with-postgresql.html</span></span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a><span class="co"># https://solutions.posit.co/connections/db/databases/postgresql/</span></span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a><span class="co">#https://medium.com/geekculture/a-simple-guide-on-connecting-rstudio-to-a-postgresql-database-9e35ccdc08be</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell" data-hash="SQL-published-version_cache/html/connect to sql_972de54dc15ef6279156791444965c1d">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>mydb <span class="ot">&lt;-</span> <span class="fu">dbConnect</span>(RSQLite<span class="sc">::</span><span class="fu">SQLite</span>(), <span class="st">"sample.sqlite"</span>)</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="fu">dbListTables</span>(mydb) <span class="co"># returns a list of tables in your database</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>mydb <span class="ot">&lt;-</span> <span class="fu">dbConnect</span>(RSQLite<span class="sc">::</span><span class="fu">SQLite</span>(), <span class="st">"sample.sqlite"</span>)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="fu">dbListTables</span>(mydb) <span class="co"># returns a list of tables in your database</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>character(0)</code></pre>
+<pre><code>[1] "other_sample" "sample"      </code></pre>
 </div>
 </div>
 </section>
@@ -194,38 +203,38 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p><span class="math display">\[\underbrace{\text{FROM }}_{\text{from where}} \underbrace{\text{db\_name}}_{\text{name}}\]</span></p>
 <p>See e.g.,</p>
 <div class="cell" data-hash="SQL-published-version_cache/html/unnamed-chunk-1_d53f5624cef3d213d42daa6465d0761a">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>mydb <span class="op">&lt;-</span> dbConnect(RSQLite:<span class="ch">:SQLite</span>(), <span class="ot">"sample.sqlite"</span>)</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="op">*</span></span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> <span class="kw">sample</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>mydb <span class="op">&lt;-</span> dbConnect(RSQLite:<span class="ch">:SQLite</span>(), <span class="ot">"sample.sqlite"</span>)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="op">*</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> <span class="kw">sample</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>You can run these commands in r using the following syntax. Since you can’t run the sql commands in quarto without compiling, I’ve used this method to check that my sql commands actually work.</p>
 <div class="cell" data-hash="SQL-published-version_cache/html/r-to-sql_d63770b88792aa3af8b0d53505abb85b">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>mydb <span class="ot">&lt;-</span> <span class="fu">dbConnect</span>(RSQLite<span class="sc">::</span><span class="fu">SQLite</span>(), <span class="st">"sample.sqlite"</span>)</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="fu">dbGetQuery</span>(mydb,<span class="st">'</span></span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="st">  select *</span></span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="st">  from "sample"</span></span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="st">  limit 10</span></span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="st">'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>mydb <span class="ot">&lt;-</span> <span class="fu">dbConnect</span>(RSQLite<span class="sc">::</span><span class="fu">SQLite</span>(), <span class="st">"sample.sqlite"</span>)</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="fu">dbGetQuery</span>(mydb,<span class="st">'</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="st">  select *</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="st">  from "sample"</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="st">  limit 10</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="st">'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>   id           x1         x2           y g
-1   1 -0.292322973  17.622036   79.569812 0
-2   2  1.103428094  -3.226083  -12.985231 0
-3   3  0.178622761  63.534728  245.547251 0
-4   4 -0.837106572  17.725579   50.542776 1
-5   5  1.219368664 -25.444891 -102.049791 0
-6   6  0.330327419   9.982296   44.160825 0
-7   7 -0.006858368  13.432985   44.459063 0
-8   8 -0.006800915  -5.060463    5.424679 1
-9   9 -0.142207830  23.659236   97.476765 0
-10 10  0.129038201   6.329206   25.812063 0</code></pre>
+<pre><code>   id         x1          x2           y g
+1   1  0.2294868  14.3156629  74.7362982 0
+2   2  0.6851657  14.1110263  73.5693131 0
+3   3 -0.5247317 -12.8748044 -40.5904988 1
+4   4  0.3784018   7.0292202  27.0929951 0
+5   5 -0.8718342  -0.3591293   1.6870891 0
+6   6 -0.2286860  10.9886896  39.6442041 0
+7   7  0.3249191   2.3494209  23.1583781 0
+8   8 -1.0748827   2.5263681   0.5947356 0
+9   9  1.0472492  22.1233829 110.3033277 1
+10 10 -1.4071715   2.2942946  14.5204852 0</code></pre>
 </div>
 </div>
 <p>This can be modified (obviously!). Suppose you need two variables, <code>x1</code> and <code>x2</code>.</p>
 <div class="cell" data-hash="SQL-published-version_cache/html/unnamed-chunk-2_7f258cc8dfc7d77d47f1986e3996f78f">
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> x1, x2</span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> <span class="kw">sample</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> x1, x2</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> <span class="kw">sample</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="knitsql-table">
 <table class="table table-sm table-striped small">
 <caption>Displaying records 1 - 10</caption>
@@ -237,44 +246,44 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </thead>
 <tbody>
 <tr class="odd">
-<td style="text-align: right;">-0.2923230</td>
-<td style="text-align: right;">17.622036</td>
+<td style="text-align: right;">0.2294868</td>
+<td style="text-align: right;">14.3156629</td>
 </tr>
 <tr class="even">
-<td style="text-align: right;">1.1034281</td>
-<td style="text-align: right;">-3.226083</td>
+<td style="text-align: right;">0.6851657</td>
+<td style="text-align: right;">14.1110263</td>
 </tr>
 <tr class="odd">
-<td style="text-align: right;">0.1786228</td>
-<td style="text-align: right;">63.534728</td>
+<td style="text-align: right;">-0.5247317</td>
+<td style="text-align: right;">-12.8748044</td>
 </tr>
 <tr class="even">
-<td style="text-align: right;">-0.8371066</td>
-<td style="text-align: right;">17.725579</td>
+<td style="text-align: right;">0.3784018</td>
+<td style="text-align: right;">7.0292202</td>
 </tr>
 <tr class="odd">
-<td style="text-align: right;">1.2193687</td>
-<td style="text-align: right;">-25.444891</td>
+<td style="text-align: right;">-0.8718342</td>
+<td style="text-align: right;">-0.3591293</td>
 </tr>
 <tr class="even">
-<td style="text-align: right;">0.3303274</td>
-<td style="text-align: right;">9.982296</td>
+<td style="text-align: right;">-0.2286860</td>
+<td style="text-align: right;">10.9886896</td>
 </tr>
 <tr class="odd">
-<td style="text-align: right;">-0.0068584</td>
-<td style="text-align: right;">13.432985</td>
+<td style="text-align: right;">0.3249191</td>
+<td style="text-align: right;">2.3494209</td>
 </tr>
 <tr class="even">
-<td style="text-align: right;">-0.0068009</td>
-<td style="text-align: right;">-5.060463</td>
+<td style="text-align: right;">-1.0748827</td>
+<td style="text-align: right;">2.5263681</td>
 </tr>
 <tr class="odd">
-<td style="text-align: right;">-0.1422078</td>
-<td style="text-align: right;">23.659236</td>
+<td style="text-align: right;">1.0472492</td>
+<td style="text-align: right;">22.1233829</td>
 </tr>
 <tr class="even">
-<td style="text-align: right;">0.1290382</td>
-<td style="text-align: right;">6.329206</td>
+<td style="text-align: right;">-1.4071715</td>
+<td style="text-align: right;">2.2942946</td>
 </tr>
 </tbody>
 </table>
@@ -282,9 +291,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <p>Here’s a more advanced query where we select rows where <code>var_1</code> <span class="math inline">\(&gt; 10\)</span></p>
 <div class="cell" data-hash="SQL-published-version_cache/html/unnamed-chunk-3_23bd788f1e9cc2463f79fb10d66a05f6">
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> x1, x2</span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> <span class="kw">sample</span></span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> x2 <span class="op">&gt;=</span> <span class="dv">10</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> x1, x2</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> <span class="kw">sample</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> x2 <span class="op">&gt;=</span> <span class="dv">10</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="knitsql-table">
 <table class="table table-sm table-striped small">
 <caption>Displaying records 1 - 10</caption>
@@ -296,44 +305,44 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </thead>
 <tbody>
 <tr class="odd">
-<td style="text-align: right;">-0.2923230</td>
-<td style="text-align: right;">17.62204</td>
+<td style="text-align: right;">0.2294868</td>
+<td style="text-align: right;">14.31566</td>
 </tr>
 <tr class="even">
-<td style="text-align: right;">0.1786228</td>
-<td style="text-align: right;">63.53473</td>
+<td style="text-align: right;">0.6851657</td>
+<td style="text-align: right;">14.11103</td>
 </tr>
 <tr class="odd">
-<td style="text-align: right;">-0.8371066</td>
-<td style="text-align: right;">17.72558</td>
+<td style="text-align: right;">-0.2286860</td>
+<td style="text-align: right;">10.98869</td>
 </tr>
 <tr class="even">
-<td style="text-align: right;">-0.0068584</td>
-<td style="text-align: right;">13.43298</td>
+<td style="text-align: right;">1.0472492</td>
+<td style="text-align: right;">22.12338</td>
 </tr>
 <tr class="odd">
-<td style="text-align: right;">-0.1422078</td>
-<td style="text-align: right;">23.65924</td>
+<td style="text-align: right;">1.1895325</td>
+<td style="text-align: right;">23.87819</td>
 </tr>
 <tr class="even">
-<td style="text-align: right;">-1.4434837</td>
-<td style="text-align: right;">29.94631</td>
+<td style="text-align: right;">-1.3983135</td>
+<td style="text-align: right;">13.66420</td>
 </tr>
 <tr class="odd">
-<td style="text-align: right;">-0.7600478</td>
-<td style="text-align: right;">34.21095</td>
+<td style="text-align: right;">1.3117561</td>
+<td style="text-align: right;">23.25230</td>
 </tr>
 <tr class="even">
-<td style="text-align: right;">-1.6875069</td>
-<td style="text-align: right;">18.19395</td>
+<td style="text-align: right;">-0.7598938</td>
+<td style="text-align: right;">18.08172</td>
 </tr>
 <tr class="odd">
-<td style="text-align: right;">-1.2902722</td>
-<td style="text-align: right;">25.84801</td>
+<td style="text-align: right;">-0.2124152</td>
+<td style="text-align: right;">17.37922</td>
 </tr>
 <tr class="even">
-<td style="text-align: right;">-0.3086429</td>
-<td style="text-align: right;">19.90835</td>
+<td style="text-align: right;">1.5239547</td>
+<td style="text-align: right;">23.28614</td>
 </tr>
 </tbody>
 </table>
@@ -341,50 +350,48 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <p>Often you need summaries or operations by group <code>var_1</code> <span class="math inline">\(&gt; 10\)</span>:</p>
 <div class="cell" data-hash="SQL-published-version_cache/html/unnamed-chunk-4_f2aa257814243ebe8508492326319e50">
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="fu">avg</span>(var1)</span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> db_name</span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="kw">GROUP</span> <span class="kw">BY</span> group_var</span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="kw">HAVING</span> var2 <span class="op">&gt;</span> <span class="dv">0</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="fu">avg</span>(var1)</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> db_name</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="kw">GROUP</span> <span class="kw">BY</span> group_var</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="kw">HAVING</span> var2 <span class="op">&gt;</span> <span class="dv">0</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell" data-hash="SQL-published-version_cache/html/unnamed-chunk-5_350f2a6c6ab7ad2a0e38e7197bf25d97">
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>mydb <span class="ot">&lt;-</span> <span class="fu">dbConnect</span>(RSQLite<span class="sc">::</span><span class="fu">SQLite</span>(), <span class="st">"sample.sqlite"</span>)</span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="fu">dbGetQuery</span>(mydb,<span class="st">'</span></span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="st">  select avg("x1")</span></span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="st">  from "sample"</span></span>
-<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a><span class="st">  group by "g"</span></span>
-<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a><span class="st">  having x2 &gt;= 0</span></span>
-<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a><span class="st">'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>mydb <span class="ot">&lt;-</span> <span class="fu">dbConnect</span>(RSQLite<span class="sc">::</span><span class="fu">SQLite</span>(), <span class="st">"sample.sqlite"</span>)</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="fu">dbGetQuery</span>(mydb,<span class="st">'</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="st">  select avg("x1")</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="st">  from "sample"</span></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a><span class="st">  group by "g"</span></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a><span class="st">  having x2 &gt;= 0</span></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a><span class="st">'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>    avg("x1")
-1 0.001398952
-2 0.008783227</code></pre>
+<pre><code>   avg("x1")
+1 0.06403565</code></pre>
 </div>
 </div>
 <p>What is the difference? <code>HAVING</code> applies to groups as a whole whereas <code>WHERE</code> applies to individual rows. If you have both, the <code>WHERE</code> clause is applied first, the <code>GROUP BY</code> clause is second - so only the individual rows that meet the <code>WHERE</code> clause are grouped. The <code>HAVING</code> clause is then applied to the output. Then only the groups that meet the <code>HAVING</code> condition will appear.</p>
 <p>Suppose you need both:</p>
 <div class="cell" data-hash="SQL-published-version_cache/html/having-eg_a7503cbb46958c9f7afadd510f518187">
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="fu">AVG</span>(var_3)</span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> db_name</span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> var1 <span class="op">&gt;=</span> <span class="dv">10</span></span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="kw">GROUP</span> <span class="kw">BY</span> group_var</span>
-<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="kw">HAVING</span> var_2 <span class="op">&gt;</span> <span class="dv">5</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="fu">AVG</span>(var_3)</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> db_name</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> var1 <span class="op">&gt;=</span> <span class="dv">10</span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="kw">GROUP</span> <span class="kw">BY</span> group_var</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="kw">HAVING</span> var_2 <span class="op">&gt;</span> <span class="dv">5</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Above you’ll get the average of variable 3 from <span class="math inline">\(db\_name\)</span> only for the individual rows where <span class="math inline">\(var\_1\)</span> is greater than 10 grouped by group_var where, within the groups their associated <span class="math inline">\(var\_2\)</span> value is greater than 5.</p>
 <div class="cell" data-hash="SQL-published-version_cache/html/unnamed-chunk-6_90539d3daf2175d8de84c547e9f2c837">
-<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>mydb <span class="ot">&lt;-</span> <span class="fu">dbConnect</span>(RSQLite<span class="sc">::</span><span class="fu">SQLite</span>(), <span class="st">"sample.sqlite"</span>)</span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="fu">dbGetQuery</span>(mydb,<span class="st">'</span></span>
-<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="st">  select avg("y")</span></span>
-<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="st">  from "sample"</span></span>
-<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a><span class="st">  where "x1" &gt;= 3 </span></span>
-<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a><span class="st">  group by "g"</span></span>
-<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a><span class="st">  having x2 &gt;= 0</span></span>
-<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a><span class="st">'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>mydb <span class="ot">&lt;-</span> <span class="fu">dbConnect</span>(RSQLite<span class="sc">::</span><span class="fu">SQLite</span>(), <span class="st">"sample.sqlite"</span>)</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="fu">dbGetQuery</span>(mydb,<span class="st">'</span></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="st">  select avg("y")</span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a><span class="st">  from "sample"</span></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a><span class="st">  where "x1" &gt;= 3 </span></span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a><span class="st">  group by "g"</span></span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a><span class="st">  having x2 &gt;= 0</span></span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a><span class="st">'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>   avg("y")
-1  43.20164
-2 158.00006</code></pre>
+<pre><code>  avg("y")
+1 59.87953</code></pre>
 </div>
 </div>
 </section>
@@ -436,27 +443,26 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="anchored" data-anchor-id="aliasing">Aliasing</h2>
 <p>Sometimes you need to alias variables. This is especially necessary when merging as you can overwrite columns that have the same name that aren’t explicitly part of the merge.</p>
 <div class="cell" data-hash="SQL-published-version_cache/html/unnamed-chunk-7_13bb32c4db6bdef8c1eca01e47776963">
-<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> var <span class="kw">AS</span> new_var_name</span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> <span class="op">..</span>.</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> var <span class="kw">AS</span> new_var_name</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> <span class="op">..</span>.</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>You can also alias data frames - this is useful when you have multiple data frames.</p>
 <div class="cell" data-hash="SQL-published-version_cache/html/unnamed-chunk-8_3d7b1403aa3cc323c7eab2701055ba71">
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> var <span class="kw">AS</span> new_var_name</span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> df1 a </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> var <span class="kw">AS</span> new_var_name</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> df1 a </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell" data-hash="SQL-published-version_cache/html/unnamed-chunk-9_5c8bd7ad9fb4144f1dfa3025f704d6e0">
-<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>mydb <span class="ot">&lt;-</span> <span class="fu">dbConnect</span>(RSQLite<span class="sc">::</span><span class="fu">SQLite</span>(), <span class="st">"sample.sqlite"</span>)</span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="fu">dbGetQuery</span>(mydb,<span class="st">'</span></span>
-<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a><span class="st">  select "g" as "group", ROUND(avg("y"),2) as "new_average"</span></span>
-<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a><span class="st">  from "sample" "b"</span></span>
-<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a><span class="st">  group by "g"</span></span>
-<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a><span class="st">  having "x2" &gt;= 0</span></span>
-<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a><span class="st">'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>mydb <span class="ot">&lt;-</span> <span class="fu">dbConnect</span>(RSQLite<span class="sc">::</span><span class="fu">SQLite</span>(), <span class="st">"sample.sqlite"</span>)</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a><span class="fu">dbGetQuery</span>(mydb,<span class="st">'</span></span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a><span class="st">  select "g" as "group", ROUND(avg("y"),2) as "new_average"</span></span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a><span class="st">  from "sample" "b"</span></span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a><span class="st">  group by "g"</span></span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a><span class="st">  having "x2" &gt;= 0</span></span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a><span class="st">'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>  group new_average
-1     0       39.29
-2     1       46.45</code></pre>
+1     0       43.42</code></pre>
 </div>
 </div>
 </section>
@@ -464,11 +470,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="anchored" data-anchor-id="converting-data-types">Converting Data Types</h2>
 <p>Sometimes the data is in one format and you need it in another. You can use <code>CAST</code> to do this</p>
 <div class="cell" data-hash="SQL-published-version_cache/html/unnamed-chunk-10_356e4b51f4ef2bf386e925610bfc6939">
-<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">CAST</span>(variable <span class="kw">AS</span> <span class="dt">int</span><span class="op">/</span><span class="dt">numeric</span><span class="op">/</span>varcar<span class="op">/</span><span class="dt">time</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">CAST</span>(variable <span class="kw">AS</span> <span class="dt">int</span><span class="op">/</span><span class="dt">numeric</span><span class="op">/</span>varcar<span class="op">/</span><span class="dt">time</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Sometimes you need to get rid of nulls, to do that use <code>COALESCE</code></p>
 <div class="cell" data-hash="SQL-published-version_cache/html/unnamed-chunk-11_244a8b7e5a500581faaeab5281c289bb">
-<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">COALESCE</span>(variable, <span class="dv">0</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">COALESCE</span>(variable, <span class="dv">0</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="extracting" class="level2">
@@ -476,15 +482,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>A lot of times when dealing with dates you’ll need a range or only part of the information given. To extract this data, you need the command <code>extract</code>.</p>
 <p>This extracts a year from a date:</p>
 <div class="cell" data-hash="SQL-published-version_cache/html/unnamed-chunk-12_d7bd1fae89faf7291eca83be45b4ff02">
-<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">EXTRACT</span>(<span class="dt">Year</span> <span class="kw">from</span> date_var)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">EXTRACT</span>(<span class="dt">Year</span> <span class="kw">from</span> date_var)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>This extracts an epoch (i.e.&nbsp;the time difference) between the end date and the start date:</p>
 <div class="cell" data-hash="SQL-published-version_cache/html/unnamed-chunk-13_06921690e4d5775e272f50268c00bdcb">
-<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">EXTRACT</span>(EPOCH <span class="kw">from</span> endvar<span class="op">-</span>startvar)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">EXTRACT</span>(EPOCH <span class="kw">from</span> endvar<span class="op">-</span>startvar)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Suppose, however, that you only want the days in the epoch. That’s surprisingly easy with the following code:</p>
 <div class="cell" data-hash="SQL-published-version_cache/html/unnamed-chunk-14_ca218e52aed9e912cc1004734b6052d9">
-<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">EXTRACT</span>(<span class="dt">Day</span> <span class="kw">from</span> endvar<span class="op">-</span>startvar)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">EXTRACT</span>(<span class="dt">Day</span> <span class="kw">from</span> endvar<span class="op">-</span>startvar)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="sec-aggregate" class="level2">
@@ -542,10 +548,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h3 class="anchored" data-anchor-id="percentiles">Percentiles</h3>
 <p>As you could see from above, extracting the median is difficult. If you want a bunch of percentiles, the problem is even worse.</p>
 <div class="cell" data-hash="SQL-published-version_cache/html/percentiles_e130a7ecb74dc4a3f47792cc9f990f44">
-<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> </span>
-<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>UNNEST(<span class="dt">array</span>[<span class="dv">0</span>, <span class="fl">0.25</span>, <span class="fl">0.5</span>, <span class="fl">0.75</span>, <span class="dv">1</span>]) <span class="kw">AS</span> percentile, </span>
-<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>UNNEST(<span class="fu">PERCENTILE_CONT</span>(<span class="dt">array</span>[<span class="dv">0</span>, <span class="fl">0.25</span>, <span class="fl">0.5</span>, <span class="fl">0.75</span>, <span class="dv">1</span>]) within <span class="kw">group</span> (<span class="kw">order</span> <span class="kw">by</span> var1)) <span class="op">&lt;</span><span class="co">---- Note that unnest wraps the whole thing!  </span></span>
-<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> <span class="op">..</span>.</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> </span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>UNNEST(<span class="dt">array</span>[<span class="dv">0</span>, <span class="fl">0.25</span>, <span class="fl">0.5</span>, <span class="fl">0.75</span>, <span class="dv">1</span>]) <span class="kw">AS</span> percentile, </span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>UNNEST(<span class="fu">PERCENTILE_CONT</span>(<span class="dt">array</span>[<span class="dv">0</span>, <span class="fl">0.25</span>, <span class="fl">0.5</span>, <span class="fl">0.75</span>, <span class="dv">1</span>]) within <span class="kw">group</span> (<span class="kw">order</span> <span class="kw">by</span> var1)) <span class="op">&lt;</span><span class="co">---- Note that unnest wraps the whole thing!  </span></span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> <span class="op">..</span>.</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>You have two options for calculating percentiles <code>PERCENTILE_CONT</code> and <code>PERCENTILE_DISC</code>. <code>PERCENTILE_CONT</code> will interpolate values while <code>PERCENTILE_DISC</code> will give you values only from your data. Suppose you have 2,3,4,5. PERCENTILE_CONT would give you 3.5, PERCENTILE_DISC gives you 3.</p>
 </section>
@@ -573,17 +579,17 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </ul>
 <p>These joins are all on some variable.</p>
 <div class="cell" data-hash="SQL-published-version_cache/html/join_6b074fdbfcf01e50d2bbbd7e2fa26fdc">
-<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> a.var1, a.var2, a.<span class="kw">id</span>, b.var3, b.var4, b.id1 <span class="op">&lt;</span><span class="co">---- note the aliases up here.  This is good practice to show where you're getting each variable from</span></span>
-<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> df1 a <span class="op">&lt;</span><span class="co">---- alias dataframe 1 as a</span></span>
-<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a><span class="kw">INNER</span> <span class="kw">JOIN</span> df2 b <span class="op">&lt;</span><span class="co">----- alias dataframe 2 as b</span></span>
-<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a><span class="kw">ON</span> a.<span class="kw">id</span> <span class="op">=</span> b.<span class="kw">id</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> a.var1, a.var2, a.<span class="kw">id</span>, b.var3, b.var4, b.id1 <span class="op">&lt;</span><span class="co">---- note the aliases up here.  This is good practice to show where you're getting each variable from</span></span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> df1 a <span class="op">&lt;</span><span class="co">---- alias dataframe 1 as a</span></span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a><span class="kw">INNER</span> <span class="kw">JOIN</span> df2 b <span class="op">&lt;</span><span class="co">----- alias dataframe 2 as b</span></span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a><span class="kw">ON</span> a.<span class="kw">id</span> <span class="op">=</span> b.<span class="kw">id</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>You can use <code>OR</code> in the join to join on either value. <code>AND</code> works too.</p>
 <div class="cell" data-hash="SQL-published-version_cache/html/join2_02d2db392265d3f7a7bedebd5f520df7">
-<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> a.var1, a.var2, a.<span class="kw">id</span>, a.id2, b.var3, b.var4, b.id1, b.alt_id <span class="op">&lt;</span><span class="co">---- note the aliases up here.  This is good practice to show where you're getting each variable from</span></span>
-<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> df1 a <span class="op">&lt;</span><span class="co">---- alias dataframe 1 as a</span></span>
-<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a><span class="kw">INNER</span> <span class="kw">JOIN</span> df2 b <span class="op">&lt;</span><span class="co">----- alias dataframe 2 as b</span></span>
-<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a><span class="kw">ON</span> a.<span class="kw">id</span> <span class="op">=</span> b.<span class="kw">id</span> <span class="kw">OR</span> a.var1 <span class="op">=</span> b.alt_id <span class="op">&lt;</span><span class="co">---- this joins if EITHER is true</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> a.var1, a.var2, a.<span class="kw">id</span>, a.id2, b.var3, b.var4, b.id1, b.alt_id <span class="op">&lt;</span><span class="co">---- note the aliases up here.  This is good practice to show where you're getting each variable from</span></span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> df1 a <span class="op">&lt;</span><span class="co">---- alias dataframe 1 as a</span></span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a><span class="kw">INNER</span> <span class="kw">JOIN</span> df2 b <span class="op">&lt;</span><span class="co">----- alias dataframe 2 as b</span></span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a><span class="kw">ON</span> a.<span class="kw">id</span> <span class="op">=</span> b.<span class="kw">id</span> <span class="kw">OR</span> a.var1 <span class="op">=</span> b.alt_id <span class="op">&lt;</span><span class="co">---- this joins if EITHER is true</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <ul>
 <li>UNION
@@ -592,11 +598,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </ul></li>
 </ul>
 <div class="cell" data-hash="SQL-published-version_cache/html/union-example_e2bcb77dc64e72ea3db677a28a1404b4">
-<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="op">..</span>.</span>
-<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> <span class="op">..</span>.</span>
-<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a><span class="kw">UNION</span></span>
-<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="op">..</span>.</span>
-<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> <span class="op">..</span>.</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="op">..</span>.</span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> <span class="op">..</span>.</span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a><span class="kw">UNION</span></span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="op">..</span>.</span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> <span class="op">..</span>.</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <ul>
 <li>UNION ALL
@@ -655,13 +661,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h3 class="anchored" data-anchor-id="bounding-window-functions">Bounding window functions</h3>
 <p>Sometimes you need to search within a certain <strong>window</strong> in a group as opposed to within an entire group. Suppose we wanted a moving average within the last three years. We could do that by properly bounding our query. The bounds come after the <code>ORDER BY</code> clause.</p>
 <div class="cell" data-hash="SQL-published-version_cache/html/unnamed-chunk-15_ce3b93c39b5ca8d03a41ded486004466">
-<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="fu">AVG</span>(var1) <span class="kw">OVER</span>  <span class="op">&lt;</span><span class="co">---- give us the mean of variable 1</span></span>
-<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a> (  </span>
-<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a> <span class="kw">PARTITION</span> <span class="kw">BY</span> country <span class="op">&lt;</span><span class="co">---- group by country</span></span>
-<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a> <span class="kw">ORDER</span> <span class="kw">BY</span> <span class="dt">year</span> <span class="kw">desc</span> <span class="op">&lt;</span><span class="co">---- order by year descending</span></span>
-<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a> <span class="kw">ROWS</span> <span class="kw">BETWEEN</span> <span class="dv">2</span> <span class="kw">PRECEDING</span> <span class="kw">AND</span> <span class="kw">CURRENT</span> <span class="kw">ROW</span> <span class="op">&lt;</span><span class="co">---- gives us the last 3 years.  includes the current row.</span></span>
-<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> df1</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="fu">AVG</span>(var1) <span class="kw">OVER</span>  <span class="op">&lt;</span><span class="co">---- give us the mean of variable 1</span></span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a> (  </span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a> <span class="kw">PARTITION</span> <span class="kw">BY</span> country <span class="op">&lt;</span><span class="co">---- group by country</span></span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a> <span class="kw">ORDER</span> <span class="kw">BY</span> <span class="dt">year</span> <span class="kw">desc</span> <span class="op">&lt;</span><span class="co">---- order by year descending</span></span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a> <span class="kw">ROWS</span> <span class="kw">BETWEEN</span> <span class="dv">2</span> <span class="kw">PRECEDING</span> <span class="kw">AND</span> <span class="kw">CURRENT</span> <span class="kw">ROW</span> <span class="op">&lt;</span><span class="co">---- gives us the last 3 years.  includes the current row.</span></span>
+<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> df1</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>We can be fairly creative with the bounds using the following building blocks:</p>
 <table class="table">
@@ -708,14 +714,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="anchored" data-anchor-id="conditionals">Conditionals</h2>
 <p>Sometimes you don’t just need an average, you need a conditional average or sum. This can be done with the <code>FILTER</code> command</p>
 <div class="cell" data-hash="SQL-published-version_cache/html/unnamed-chunk-16_ea20bb0b5d213f61fe157954fb60cb47">
-<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sum</span>(var) <span class="kw">FILTER</span>(<span class="kw">WHERE</span> <span class="op">..</span>.) <span class="kw">AS</span> <span class="op">..</span>.</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sum</span>(var) <span class="kw">FILTER</span>(<span class="kw">WHERE</span> <span class="op">..</span>.) <span class="kw">AS</span> <span class="op">..</span>.</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Sometimes you need to create a new variable based on the values of other variables. You do that with <code>CASE WHEN</code></p>
 <div class="cell" data-hash="SQL-published-version_cache/html/unnamed-chunk-17_7ef02c9944916982fd149ea0eca92f31">
-<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="cf">CASE</span> </span>
-<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>  <span class="cf">WHEN</span> [condition] <span class="cf">THEN</span> [result]</span>
-<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>  <span class="cf">WHEN</span> [condition2] <span class="cf">THEN</span> [result2]</span>
-<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>  <span class="cf">ELSE</span> [result3] <span class="cf">END</span> <span class="kw">AS</span> new_conditional_variable  </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="cf">CASE</span> </span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>  <span class="cf">WHEN</span> [condition] <span class="cf">THEN</span> [result]</span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>  <span class="cf">WHEN</span> [condition2] <span class="cf">THEN</span> [result2]</span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>  <span class="cf">ELSE</span> [result3] <span class="cf">END</span> <span class="kw">AS</span> new_conditional_variable  </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Note that the <code>CASE WHEN ...</code> can be used in the <code>GROUP BY</code> command to create groups.</p>
 </section>
@@ -760,46 +766,46 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>Sometimes you need to create a separate table that you can then extract data from to avoid conflicts like using a window function in the <code>WHERE</code> clause. You do this with a common table expression (CTE).</p>
 <p>The basic syntax is as follows:</p>
 <div class="cell" data-hash="SQL-published-version_cache/html/cte-plain_20d18442a326021fdfda73bd78a663e6">
-<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="kw">WITH</span> cte1 <span class="kw">AS</span> (</span>
-<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="op">..</span>.</span>
-<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> db1</span>
-<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="op">..</span>.</span>
-<span id="cb31-7"><a href="#cb31-7" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> <span class="op">..</span>. (likely db1 <span class="kw">or</span> db2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="kw">WITH</span> cte1 <span class="kw">AS</span> (</span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="op">..</span>.</span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> db1</span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="op">..</span>.</span>
+<span id="cb32-7"><a href="#cb32-7" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> <span class="op">..</span>. (likely db1 <span class="kw">or</span> db2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>You’re not limited to one CTE, you can have multiple if you want:</p>
 <div class="cell" data-hash="SQL-published-version_cache/html/ctwx2_1430c35cee033f567ba5915591471806">
-<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="kw">WITH</span> RECURSIVE cte1 <span class="kw">AS</span> (</span>
-<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="op">..</span>.</span>
-<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> db1</span>
-<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>), <span class="op">&lt;</span><span class="co">---- need the parenthesis and comma here otherwise you get an error!</span></span>
-<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a>cte2 <span class="kw">AS</span> (</span>
-<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="op">..</span>.</span>
-<span id="cb32-7"><a href="#cb32-7" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> db2</span>
-<span id="cb32-8"><a href="#cb32-8" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb32-9"><a href="#cb32-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb32-10"><a href="#cb32-10" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="op">..</span>.</span>
-<span id="cb32-11"><a href="#cb32-11" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> <span class="op">..</span>. (likely db1 <span class="kw">or</span> db2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="kw">WITH</span> RECURSIVE cte1 <span class="kw">AS</span> (</span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="op">..</span>.</span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> db1</span>
+<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a>), <span class="op">&lt;</span><span class="co">---- need the parenthesis and comma here otherwise you get an error!</span></span>
+<span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a>cte2 <span class="kw">AS</span> (</span>
+<span id="cb33-6"><a href="#cb33-6" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="op">..</span>.</span>
+<span id="cb33-7"><a href="#cb33-7" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> db2</span>
+<span id="cb33-8"><a href="#cb33-8" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb33-9"><a href="#cb33-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-10"><a href="#cb33-10" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="op">..</span>.</span>
+<span id="cb33-11"><a href="#cb33-11" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> <span class="op">..</span>. (likely db1 <span class="kw">or</span> db2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Below is an an example of using CTEs to avoid a window function in the <code>WHERE</code> clause.<a href="#fn3" class="footnote-ref" id="fnref3" role="doc-noteref"><sup>3</sup></a> The query is from a problem that asks you to find the second longest flight between two cities. This is a bit of a tricky problem because it requries a window function, concatentaion, ordering text strings, and a common table expression.</p>
 <div class="cell" data-hash="SQL-published-version_cache/html/unnamed-chunk-18_22c8f2a3e51861b3aefbaa72ba69a620">
-<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="kw">WITH</span> tmp <span class="kw">AS</span> (<span class="kw">SELECT</span> </span>
-<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a><span class="kw">id</span>, </span>
-<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>destination_location,</span>
-<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a>source_location,</span>
-<span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a>flight_start,</span>
-<span id="cb33-6"><a href="#cb33-6" aria-hidden="true" tabindex="-1"></a>flight_end,</span>
-<span id="cb33-7"><a href="#cb33-7" aria-hidden="true" tabindex="-1"></a><span class="fu">dense_rank</span>() <span class="kw">OVER</span> (</span>
-<span id="cb33-8"><a href="#cb33-8" aria-hidden="true" tabindex="-1"></a>    <span class="kw">PARTITION</span> <span class="kw">BY</span> <span class="fu">CONCAT</span>(<span class="fu">GREATEST</span>(destination_location, source_location),<span class="st">'.'</span>,<span class="fu">LEAST</span>(destination_location, source_location))</span>
-<span id="cb33-9"><a href="#cb33-9" aria-hidden="true" tabindex="-1"></a>    <span class="kw">ORDER</span> <span class="kw">BY</span> <span class="fu">extract</span>(epoch <span class="kw">from</span> flight_end <span class="op">-</span> flight_start) <span class="kw">desc</span></span>
-<span id="cb33-10"><a href="#cb33-10" aria-hidden="true" tabindex="-1"></a>) <span class="kw">AS</span> flight_duration</span>
-<span id="cb33-11"><a href="#cb33-11" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> flights)</span>
-<span id="cb33-12"><a href="#cb33-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb33-13"><a href="#cb33-13" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="kw">id</span>, destination_location, source_location, flight_start, flight_end</span>
-<span id="cb33-14"><a href="#cb33-14" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> tmp</span>
-<span id="cb33-15"><a href="#cb33-15" aria-hidden="true" tabindex="-1"></a><span class="kw">where</span> flight_duration <span class="op">=</span> <span class="dv">2</span></span>
-<span id="cb33-16"><a href="#cb33-16" aria-hidden="true" tabindex="-1"></a><span class="kw">order</span> <span class="kw">by</span> <span class="kw">id</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="kw">WITH</span> tmp <span class="kw">AS</span> (<span class="kw">SELECT</span> </span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a><span class="kw">id</span>, </span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>destination_location,</span>
+<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a>source_location,</span>
+<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a>flight_start,</span>
+<span id="cb34-6"><a href="#cb34-6" aria-hidden="true" tabindex="-1"></a>flight_end,</span>
+<span id="cb34-7"><a href="#cb34-7" aria-hidden="true" tabindex="-1"></a><span class="fu">dense_rank</span>() <span class="kw">OVER</span> (</span>
+<span id="cb34-8"><a href="#cb34-8" aria-hidden="true" tabindex="-1"></a>    <span class="kw">PARTITION</span> <span class="kw">BY</span> <span class="fu">CONCAT</span>(<span class="fu">GREATEST</span>(destination_location, source_location),<span class="st">'.'</span>,<span class="fu">LEAST</span>(destination_location, source_location))</span>
+<span id="cb34-9"><a href="#cb34-9" aria-hidden="true" tabindex="-1"></a>    <span class="kw">ORDER</span> <span class="kw">BY</span> <span class="fu">extract</span>(epoch <span class="kw">from</span> flight_end <span class="op">-</span> flight_start) <span class="kw">desc</span></span>
+<span id="cb34-10"><a href="#cb34-10" aria-hidden="true" tabindex="-1"></a>) <span class="kw">AS</span> flight_duration</span>
+<span id="cb34-11"><a href="#cb34-11" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> flights)</span>
+<span id="cb34-12"><a href="#cb34-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-13"><a href="#cb34-13" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="kw">id</span>, destination_location, source_location, flight_start, flight_end</span>
+<span id="cb34-14"><a href="#cb34-14" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> tmp</span>
+<span id="cb34-15"><a href="#cb34-15" aria-hidden="true" tabindex="-1"></a><span class="kw">where</span> flight_duration <span class="op">=</span> <span class="dv">2</span></span>
+<span id="cb34-16"><a href="#cb34-16" aria-hidden="true" tabindex="-1"></a><span class="kw">order</span> <span class="kw">by</span> <span class="kw">id</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Let’s go through this, starting with the structure. Here we’re creating a common table expression called cte and then using it</p>
 <p><span class="math inline">\(\text{WITH } {\color{red}{\text{tmp}}} \text{ AS (} \leftarrow \text{Create CTE called } \color{red}{\text{tmp}}\)</span><br>
@@ -814,54 +820,54 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="anchored" data-anchor-id="subqueries">Subqueries</h2>
 <p>Suppose you need a one off query within a query. You can use a sub query! The basic syntax is below. You can put them anywhere. For example, here’s one in the <code>FROM</code> clause. Note that you need to alias your subqueries or else they’ll fail</p>
 <div class="cell" data-hash="SQL-published-version_cache/html/unnamed-chunk-19_0dcd9e5853782f91c305c1b9617f931a">
-<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="op">..</span>.</span>
-<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> (</span>
-<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>  <span class="kw">SELECT</span> <span class="op">*</span></span>
-<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a>  <span class="kw">FROM</span> db1</span>
-<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a>) <span class="kw">AS</span> db2</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="op">..</span>.</span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> (</span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>  <span class="kw">SELECT</span> <span class="op">*</span></span>
+<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a>  <span class="kw">FROM</span> db1</span>
+<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a>) <span class="kw">AS</span> db2</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>You could, however, do one in the <code>SELECT</code> clause if you wanted</p>
 <div class="cell" data-hash="SQL-published-version_cache/html/unnamed-chunk-20_39dcdd7983445931315fa838cad12f39">
-<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> (</span>
-<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>  <span class="kw">SELECT</span> <span class="op">..</span>.</span>
-<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>  <span class="kw">FROM</span> <span class="op">..</span>.</span>
-<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> db1</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> (</span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>  <span class="kw">SELECT</span> <span class="op">..</span>.</span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a>  <span class="kw">FROM</span> <span class="op">..</span>.</span>
+<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> db1</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>So when to use common table expressions versus subtables? Common table expressions are, generally, preferred because they’re more readable and can be used multiple times. See, e.g., below, where we havethe same query as <a href="#sec-cte">Section&nbsp;13</a> but with a subquery instead of a common table expression.</p>
 <div class="cell" data-hash="SQL-published-version_cache/html/unnamed-chunk-21_287bbd18eb8e55dcee56b10e23d60354">
-<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> </span>
-<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a><span class="kw">id</span>, </span>
-<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a>destination_location,</span>
-<span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a>source_location,</span>
-<span id="cb36-6"><a href="#cb36-6" aria-hidden="true" tabindex="-1"></a>flight_start,</span>
-<span id="cb36-7"><a href="#cb36-7" aria-hidden="true" tabindex="-1"></a>flight_end</span>
-<span id="cb36-8"><a href="#cb36-8" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> (</span>
-<span id="cb36-9"><a href="#cb36-9" aria-hidden="true" tabindex="-1"></a>    <span class="kw">SELECT</span> </span>
-<span id="cb36-10"><a href="#cb36-10" aria-hidden="true" tabindex="-1"></a>    <span class="op">*</span>,  </span>
-<span id="cb36-11"><a href="#cb36-11" aria-hidden="true" tabindex="-1"></a><span class="fu">dense_rank</span>() <span class="kw">OVER</span> (</span>
-<span id="cb36-12"><a href="#cb36-12" aria-hidden="true" tabindex="-1"></a>    <span class="kw">PARTITION</span> <span class="kw">BY</span> <span class="fu">CONCAT</span>(<span class="fu">GREATEST</span>(destination_location, source_location),<span class="st">'.'</span>,<span class="fu">LEAST</span>(destination_location, source_location))</span>
-<span id="cb36-13"><a href="#cb36-13" aria-hidden="true" tabindex="-1"></a>    <span class="kw">ORDER</span> <span class="kw">BY</span> <span class="fu">extract</span>(epoch <span class="kw">from</span> flight_end <span class="op">-</span> flight_start) <span class="kw">desc</span>) <span class="kw">AS</span> duration_rank</span>
-<span id="cb36-14"><a href="#cb36-14" aria-hidden="true" tabindex="-1"></a>    <span class="kw">FROM</span> flights</span>
-<span id="cb36-15"><a href="#cb36-15" aria-hidden="true" tabindex="-1"></a>    ) <span class="kw">AS</span> subquery</span>
-<span id="cb36-16"><a href="#cb36-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb36-17"><a href="#cb36-17" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> duration_rank <span class="op">=</span> <span class="dv">2</span></span>
-<span id="cb36-18"><a href="#cb36-18" aria-hidden="true" tabindex="-1"></a><span class="kw">order</span> <span class="kw">by</span> <span class="kw">id</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> </span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a><span class="kw">id</span>, </span>
+<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a>destination_location,</span>
+<span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a>source_location,</span>
+<span id="cb37-6"><a href="#cb37-6" aria-hidden="true" tabindex="-1"></a>flight_start,</span>
+<span id="cb37-7"><a href="#cb37-7" aria-hidden="true" tabindex="-1"></a>flight_end</span>
+<span id="cb37-8"><a href="#cb37-8" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> (</span>
+<span id="cb37-9"><a href="#cb37-9" aria-hidden="true" tabindex="-1"></a>    <span class="kw">SELECT</span> </span>
+<span id="cb37-10"><a href="#cb37-10" aria-hidden="true" tabindex="-1"></a>    <span class="op">*</span>,  </span>
+<span id="cb37-11"><a href="#cb37-11" aria-hidden="true" tabindex="-1"></a><span class="fu">dense_rank</span>() <span class="kw">OVER</span> (</span>
+<span id="cb37-12"><a href="#cb37-12" aria-hidden="true" tabindex="-1"></a>    <span class="kw">PARTITION</span> <span class="kw">BY</span> <span class="fu">CONCAT</span>(<span class="fu">GREATEST</span>(destination_location, source_location),<span class="st">'.'</span>,<span class="fu">LEAST</span>(destination_location, source_location))</span>
+<span id="cb37-13"><a href="#cb37-13" aria-hidden="true" tabindex="-1"></a>    <span class="kw">ORDER</span> <span class="kw">BY</span> <span class="fu">extract</span>(epoch <span class="kw">from</span> flight_end <span class="op">-</span> flight_start) <span class="kw">desc</span>) <span class="kw">AS</span> duration_rank</span>
+<span id="cb37-14"><a href="#cb37-14" aria-hidden="true" tabindex="-1"></a>    <span class="kw">FROM</span> flights</span>
+<span id="cb37-15"><a href="#cb37-15" aria-hidden="true" tabindex="-1"></a>    ) <span class="kw">AS</span> subquery</span>
+<span id="cb37-16"><a href="#cb37-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-17"><a href="#cb37-17" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> duration_rank <span class="op">=</span> <span class="dv">2</span></span>
+<span id="cb37-18"><a href="#cb37-18" aria-hidden="true" tabindex="-1"></a><span class="kw">order</span> <span class="kw">by</span> <span class="kw">id</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <section id="subquery-joins" class="level3">
 <h3 class="anchored" data-anchor-id="subquery-joins">Subquery Joins</h3>
 <p>Sometimes you need to do something to a database before joining it. Here a subquery join is helpful</p>
 <div class="cell" data-hash="SQL-published-version_cache/html/sub-q-join_58e5e3c9c5bce416441c877187346998">
-<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> user_id, var1, var2 </span>
-<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span>  db1</span>
-<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a><span class="kw">LEFT</span> <span class="kw">JOIN</span> </span>
-<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a>    ( <span class="op">&lt;</span><span class="co">---- begin subquery </span></span>
-<span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a>        <span class="kw">SELECT</span> <span class="kw">id</span>, var3, var4</span>
-<span id="cb37-6"><a href="#cb37-6" aria-hidden="true" tabindex="-1"></a>        <span class="kw">FROM</span> db2</span>
-<span id="cb37-7"><a href="#cb37-7" aria-hidden="true" tabindex="-1"></a>        <span class="kw">WHERE</span> <span class="op">..</span>. <span class="op">&lt;</span><span class="co">-----  you're using a subquery because you need to do something so I've included the where in here </span></span>
-<span id="cb37-8"><a href="#cb37-8" aria-hidden="true" tabindex="-1"></a>    ) <span class="kw">AS</span> a <span class="op">&lt;</span><span class="co">--- end and alias subquery </span></span>
-<span id="cb37-9"><a href="#cb37-9" aria-hidden="true" tabindex="-1"></a><span class="kw">ON</span> db1.user_id <span class="op">=</span> a.<span class="kw">id</span> <span class="op">&lt;</span><span class="co">---- join on subquery name!</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> user_id, var1, var2 </span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span>  db1</span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a><span class="kw">LEFT</span> <span class="kw">JOIN</span> </span>
+<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a>    ( <span class="op">&lt;</span><span class="co">---- begin subquery </span></span>
+<span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a>        <span class="kw">SELECT</span> <span class="kw">id</span>, var3, var4</span>
+<span id="cb38-6"><a href="#cb38-6" aria-hidden="true" tabindex="-1"></a>        <span class="kw">FROM</span> db2</span>
+<span id="cb38-7"><a href="#cb38-7" aria-hidden="true" tabindex="-1"></a>        <span class="kw">WHERE</span> <span class="op">..</span>. <span class="op">&lt;</span><span class="co">-----  you're using a subquery because you need to do something so I've included the where in here </span></span>
+<span id="cb38-8"><a href="#cb38-8" aria-hidden="true" tabindex="-1"></a>    ) <span class="kw">AS</span> a <span class="op">&lt;</span><span class="co">--- end and alias subquery </span></span>
+<span id="cb38-9"><a href="#cb38-9" aria-hidden="true" tabindex="-1"></a><span class="kw">ON</span> db1.user_id <span class="op">=</span> a.<span class="kw">id</span> <span class="op">&lt;</span><span class="co">---- join on subquery name!</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 </section>
@@ -875,114 +881,114 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="anchored" data-anchor-id="random-sample">Random Sample</h2>
 <p>The method below selects 10% of the data.</p>
 <div class="cell" data-hash="SQL-published-version_cache/html/random-sample_7492a0b6e1e2b14975d46733c4e138d2">
-<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="op">..</span>.</span>
-<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> <span class="op">..</span>.</span>
-<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a>TABLESAMPLE BERNOULLI(<span class="dv">10</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="op">..</span>.</span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> <span class="op">..</span>.</span>
+<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a>TABLESAMPLE BERNOULLI(<span class="dv">10</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="summary-statistics" class="level2">
 <h2 class="anchored" data-anchor-id="summary-statistics">Summary Statistics</h2>
 <p>Getting summary statistics is a pain the ass. So here is some code that will do it for a variable called <span class="math inline">\(a\)</span> in database <span class="math inline">\(t1\)</span>. The difficulty of the code is that it requires two separate common table expressions. Here’s a sketch of what that looks like. Note that adding RECURSIVE to the with query allows you to select from db1 in the db2 query.</p>
 <div class="cell" data-hash="SQL-published-version_cache/html/show-cte-x2-again_37b634aff2d9c09bf82bd0f1450f6efc">
-<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="kw">WITH</span> RECURSIVE cte1 <span class="kw">AS</span> (</span>
-<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="op">..</span>.</span>
-<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> db1</span>
-<span id="cb39-4"><a href="#cb39-4" aria-hidden="true" tabindex="-1"></a>),</span>
-<span id="cb39-5"><a href="#cb39-5" aria-hidden="true" tabindex="-1"></a>cte2 <span class="kw">AS</span> (</span>
-<span id="cb39-6"><a href="#cb39-6" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="op">..</span>.</span>
-<span id="cb39-7"><a href="#cb39-7" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> db2</span>
-<span id="cb39-8"><a href="#cb39-8" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb39-9"><a href="#cb39-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb39-10"><a href="#cb39-10" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="op">..</span>.</span>
-<span id="cb39-11"><a href="#cb39-11" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> <span class="op">..</span>. (likely db1 <span class="kw">or</span> db2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="kw">WITH</span> RECURSIVE cte1 <span class="kw">AS</span> (</span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="op">..</span>.</span>
+<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> db1</span>
+<span id="cb40-4"><a href="#cb40-4" aria-hidden="true" tabindex="-1"></a>),</span>
+<span id="cb40-5"><a href="#cb40-5" aria-hidden="true" tabindex="-1"></a>cte2 <span class="kw">AS</span> (</span>
+<span id="cb40-6"><a href="#cb40-6" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="op">..</span>.</span>
+<span id="cb40-7"><a href="#cb40-7" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> db2</span>
+<span id="cb40-8"><a href="#cb40-8" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb40-9"><a href="#cb40-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb40-10"><a href="#cb40-10" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="op">..</span>.</span>
+<span id="cb40-11"><a href="#cb40-11" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> <span class="op">..</span>. (likely db1 <span class="kw">or</span> db2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell" data-hash="SQL-published-version_cache/html/summary-stats_836d1c7d1c3aef101e42dda720c9f7e2">
-<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="kw">WITH</span> RECURSIVE</span>
-<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a>summary_stats <span class="kw">AS</span></span>
-<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a>(</span>
-<span id="cb40-4"><a href="#cb40-4" aria-hidden="true" tabindex="-1"></a> <span class="kw">SELECT</span> </span>
-<span id="cb40-5"><a href="#cb40-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ROUND</span>(<span class="fu">AVG</span>(a), <span class="dv">2</span>) <span class="kw">AS</span> mean,</span>
-<span id="cb40-6"><a href="#cb40-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">PERCENTILE_CONT</span>(<span class="fl">0.5</span>) WITHIN <span class="kw">GROUP</span> (<span class="kw">ORDER</span> <span class="kw">BY</span> a) <span class="kw">AS</span> <span class="fu">median</span>,</span>
-<span id="cb40-7"><a href="#cb40-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">MIN</span>(a) <span class="kw">AS</span> <span class="fu">min</span>,</span>
-<span id="cb40-8"><a href="#cb40-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">MAX</span>(a) <span class="kw">AS</span> <span class="fu">max</span>,</span>
-<span id="cb40-9"><a href="#cb40-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">MAX</span>(a) <span class="op">-</span> <span class="fu">MIN</span>(a) <span class="kw">AS</span> <span class="kw">range</span>,</span>
-<span id="cb40-10"><a href="#cb40-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ROUND</span>(<span class="fu">STDDEV</span>(a), <span class="dv">2</span>) <span class="kw">AS</span> standard_deviation,</span>
-<span id="cb40-11"><a href="#cb40-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ROUND</span>(<span class="fu">VARIANCE</span>(a), <span class="dv">2</span>) <span class="kw">AS</span> <span class="fu">variance</span>,</span>
-<span id="cb40-12"><a href="#cb40-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">PERCENTILE_CONT</span>(<span class="fl">0.25</span>) WITHIN <span class="kw">GROUP</span> (<span class="kw">ORDER</span> <span class="kw">BY</span> a) <span class="kw">AS</span> q1,</span>
-<span id="cb40-13"><a href="#cb40-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">PERCENTILE_CONT</span>(<span class="fl">0.75</span>) WITHIN <span class="kw">GROUP</span> (<span class="kw">ORDER</span> <span class="kw">BY</span> a) <span class="kw">AS</span> q3</span>
-<span id="cb40-14"><a href="#cb40-14" aria-hidden="true" tabindex="-1"></a>   <span class="kw">FROM</span> t1</span>
-<span id="cb40-15"><a href="#cb40-15" aria-hidden="true" tabindex="-1"></a>),</span>
-<span id="cb40-16"><a href="#cb40-16" aria-hidden="true" tabindex="-1"></a>row_summary_stats <span class="kw">AS</span></span>
-<span id="cb40-17"><a href="#cb40-17" aria-hidden="true" tabindex="-1"></a>(</span>
-<span id="cb40-18"><a href="#cb40-18" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> </span>
-<span id="cb40-19"><a href="#cb40-19" aria-hidden="true" tabindex="-1"></a> <span class="dv">1</span> <span class="kw">AS</span> <span class="kw">id</span>, </span>
-<span id="cb40-20"><a href="#cb40-20" aria-hidden="true" tabindex="-1"></a> <span class="st">'mean'</span> <span class="kw">AS</span> statistic, </span>
-<span id="cb40-21"><a href="#cb40-21" aria-hidden="true" tabindex="-1"></a> mean <span class="kw">AS</span> <span class="fu">value</span> </span>
-<span id="cb40-22"><a href="#cb40-22" aria-hidden="true" tabindex="-1"></a>  <span class="kw">FROM</span> summary_stats</span>
-<span id="cb40-23"><a href="#cb40-23" aria-hidden="true" tabindex="-1"></a><span class="kw">union</span> <span class="kw">all</span></span>
-<span id="cb40-24"><a href="#cb40-24" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> </span>
-<span id="cb40-25"><a href="#cb40-25" aria-hidden="true" tabindex="-1"></a> <span class="dv">2</span>, </span>
-<span id="cb40-26"><a href="#cb40-26" aria-hidden="true" tabindex="-1"></a> <span class="st">'median'</span>, </span>
-<span id="cb40-27"><a href="#cb40-27" aria-hidden="true" tabindex="-1"></a> <span class="fu">median</span> </span>
-<span id="cb40-28"><a href="#cb40-28" aria-hidden="true" tabindex="-1"></a>  <span class="kw">FROM</span> summary_stats</span>
-<span id="cb40-29"><a href="#cb40-29" aria-hidden="true" tabindex="-1"></a><span class="kw">UNION</span></span>
-<span id="cb40-30"><a href="#cb40-30" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> </span>
-<span id="cb40-31"><a href="#cb40-31" aria-hidden="true" tabindex="-1"></a> <span class="dv">3</span>, </span>
-<span id="cb40-32"><a href="#cb40-32" aria-hidden="true" tabindex="-1"></a> <span class="st">'minimum'</span>, </span>
-<span id="cb40-33"><a href="#cb40-33" aria-hidden="true" tabindex="-1"></a> <span class="fu">min</span> </span>
-<span id="cb40-34"><a href="#cb40-34" aria-hidden="true" tabindex="-1"></a>  <span class="kw">FROM</span> summary_stats</span>
-<span id="cb40-35"><a href="#cb40-35" aria-hidden="true" tabindex="-1"></a><span class="kw">UNION</span></span>
-<span id="cb40-36"><a href="#cb40-36" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> </span>
-<span id="cb40-37"><a href="#cb40-37" aria-hidden="true" tabindex="-1"></a> <span class="dv">4</span>, </span>
-<span id="cb40-38"><a href="#cb40-38" aria-hidden="true" tabindex="-1"></a> <span class="st">'maximum'</span>, </span>
-<span id="cb40-39"><a href="#cb40-39" aria-hidden="true" tabindex="-1"></a> <span class="fu">max</span> </span>
-<span id="cb40-40"><a href="#cb40-40" aria-hidden="true" tabindex="-1"></a>  <span class="kw">FROM</span> summary_stats</span>
-<span id="cb40-41"><a href="#cb40-41" aria-hidden="true" tabindex="-1"></a><span class="kw">UNION</span></span>
-<span id="cb40-42"><a href="#cb40-42" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> </span>
-<span id="cb40-43"><a href="#cb40-43" aria-hidden="true" tabindex="-1"></a> <span class="dv">5</span>, </span>
-<span id="cb40-44"><a href="#cb40-44" aria-hidden="true" tabindex="-1"></a> <span class="st">'range'</span>, </span>
-<span id="cb40-45"><a href="#cb40-45" aria-hidden="true" tabindex="-1"></a> <span class="kw">range</span> </span>
-<span id="cb40-46"><a href="#cb40-46" aria-hidden="true" tabindex="-1"></a>  <span class="kw">FROM</span> summary_stats</span>
-<span id="cb40-47"><a href="#cb40-47" aria-hidden="true" tabindex="-1"></a><span class="kw">UNION</span></span>
-<span id="cb40-48"><a href="#cb40-48" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> </span>
-<span id="cb40-49"><a href="#cb40-49" aria-hidden="true" tabindex="-1"></a> <span class="dv">6</span>, </span>
-<span id="cb40-50"><a href="#cb40-50" aria-hidden="true" tabindex="-1"></a> <span class="st">'standard deviation'</span>, </span>
-<span id="cb40-51"><a href="#cb40-51" aria-hidden="true" tabindex="-1"></a> standard_deviation </span>
-<span id="cb40-52"><a href="#cb40-52" aria-hidden="true" tabindex="-1"></a>  <span class="kw">FROM</span> summary_stats</span>
-<span id="cb40-53"><a href="#cb40-53" aria-hidden="true" tabindex="-1"></a><span class="kw">UNION</span></span>
-<span id="cb40-54"><a href="#cb40-54" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> </span>
-<span id="cb40-55"><a href="#cb40-55" aria-hidden="true" tabindex="-1"></a> <span class="dv">7</span>, </span>
-<span id="cb40-56"><a href="#cb40-56" aria-hidden="true" tabindex="-1"></a> <span class="st">'variance'</span>, </span>
-<span id="cb40-57"><a href="#cb40-57" aria-hidden="true" tabindex="-1"></a> <span class="fu">variance</span> </span>
-<span id="cb40-58"><a href="#cb40-58" aria-hidden="true" tabindex="-1"></a>  <span class="kw">FROM</span> summary_stats</span>
-<span id="cb40-59"><a href="#cb40-59" aria-hidden="true" tabindex="-1"></a><span class="kw">UNION</span></span>
-<span id="cb40-60"><a href="#cb40-60" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> </span>
-<span id="cb40-61"><a href="#cb40-61" aria-hidden="true" tabindex="-1"></a> <span class="dv">9</span>, </span>
-<span id="cb40-62"><a href="#cb40-62" aria-hidden="true" tabindex="-1"></a> <span class="st">'Q1'</span>, </span>
-<span id="cb40-63"><a href="#cb40-63" aria-hidden="true" tabindex="-1"></a> q1 </span>
-<span id="cb40-64"><a href="#cb40-64" aria-hidden="true" tabindex="-1"></a>  <span class="kw">FROM</span> summary_stats</span>
-<span id="cb40-65"><a href="#cb40-65" aria-hidden="true" tabindex="-1"></a><span class="kw">UNION</span></span>
-<span id="cb40-66"><a href="#cb40-66" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> </span>
-<span id="cb40-67"><a href="#cb40-67" aria-hidden="true" tabindex="-1"></a> <span class="dv">10</span>, </span>
-<span id="cb40-68"><a href="#cb40-68" aria-hidden="true" tabindex="-1"></a> <span class="st">'Q3'</span>, </span>
-<span id="cb40-69"><a href="#cb40-69" aria-hidden="true" tabindex="-1"></a> q3 </span>
-<span id="cb40-70"><a href="#cb40-70" aria-hidden="true" tabindex="-1"></a>  <span class="kw">FROM</span> summary_stats</span>
-<span id="cb40-71"><a href="#cb40-71" aria-hidden="true" tabindex="-1"></a><span class="kw">UNION</span></span>
-<span id="cb40-72"><a href="#cb40-72" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> </span>
-<span id="cb40-73"><a href="#cb40-73" aria-hidden="true" tabindex="-1"></a> <span class="dv">11</span>, </span>
-<span id="cb40-74"><a href="#cb40-74" aria-hidden="true" tabindex="-1"></a> <span class="st">'IQR'</span>, </span>
-<span id="cb40-75"><a href="#cb40-75" aria-hidden="true" tabindex="-1"></a> (q3 <span class="op">-</span> q1) </span>
-<span id="cb40-76"><a href="#cb40-76" aria-hidden="true" tabindex="-1"></a>  <span class="kw">FROM</span> summary_stats</span>
-<span id="cb40-77"><a href="#cb40-77" aria-hidden="true" tabindex="-1"></a><span class="kw">UNION</span></span>
-<span id="cb40-78"><a href="#cb40-78" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> </span>
-<span id="cb40-79"><a href="#cb40-79" aria-hidden="true" tabindex="-1"></a> <span class="dv">12</span>, </span>
-<span id="cb40-80"><a href="#cb40-80" aria-hidden="true" tabindex="-1"></a> <span class="st">'skewness'</span>, </span>
-<span id="cb40-81"><a href="#cb40-81" aria-hidden="true" tabindex="-1"></a> <span class="fu">ROUND</span>(<span class="dv">3</span> <span class="op">*</span> (mean <span class="op">-</span> <span class="fu">median</span>):<span class="ch">:NUMERIC</span> <span class="op">/</span> standard_deviation, <span class="dv">2</span>) <span class="kw">AS</span> skewness </span>
-<span id="cb40-82"><a href="#cb40-82" aria-hidden="true" tabindex="-1"></a>  <span class="kw">FROM</span> summary_stats</span>
-<span id="cb40-83"><a href="#cb40-83" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb40-84"><a href="#cb40-84" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="op">*</span> </span>
-<span id="cb40-85"><a href="#cb40-85" aria-hidden="true" tabindex="-1"></a> <span class="kw">FROM</span> row_summary_stats</span>
-<span id="cb40-86"><a href="#cb40-86" aria-hidden="true" tabindex="-1"></a>  <span class="kw">ORDER</span> <span class="kw">BY</span> <span class="kw">id</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="kw">WITH</span> RECURSIVE</span>
+<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a>summary_stats <span class="kw">AS</span></span>
+<span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a>(</span>
+<span id="cb41-4"><a href="#cb41-4" aria-hidden="true" tabindex="-1"></a> <span class="kw">SELECT</span> </span>
+<span id="cb41-5"><a href="#cb41-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ROUND</span>(<span class="fu">AVG</span>(a), <span class="dv">2</span>) <span class="kw">AS</span> mean,</span>
+<span id="cb41-6"><a href="#cb41-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">PERCENTILE_CONT</span>(<span class="fl">0.5</span>) WITHIN <span class="kw">GROUP</span> (<span class="kw">ORDER</span> <span class="kw">BY</span> a) <span class="kw">AS</span> <span class="fu">median</span>,</span>
+<span id="cb41-7"><a href="#cb41-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">MIN</span>(a) <span class="kw">AS</span> <span class="fu">min</span>,</span>
+<span id="cb41-8"><a href="#cb41-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">MAX</span>(a) <span class="kw">AS</span> <span class="fu">max</span>,</span>
+<span id="cb41-9"><a href="#cb41-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">MAX</span>(a) <span class="op">-</span> <span class="fu">MIN</span>(a) <span class="kw">AS</span> <span class="kw">range</span>,</span>
+<span id="cb41-10"><a href="#cb41-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ROUND</span>(<span class="fu">STDDEV</span>(a), <span class="dv">2</span>) <span class="kw">AS</span> standard_deviation,</span>
+<span id="cb41-11"><a href="#cb41-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ROUND</span>(<span class="fu">VARIANCE</span>(a), <span class="dv">2</span>) <span class="kw">AS</span> <span class="fu">variance</span>,</span>
+<span id="cb41-12"><a href="#cb41-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">PERCENTILE_CONT</span>(<span class="fl">0.25</span>) WITHIN <span class="kw">GROUP</span> (<span class="kw">ORDER</span> <span class="kw">BY</span> a) <span class="kw">AS</span> q1,</span>
+<span id="cb41-13"><a href="#cb41-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">PERCENTILE_CONT</span>(<span class="fl">0.75</span>) WITHIN <span class="kw">GROUP</span> (<span class="kw">ORDER</span> <span class="kw">BY</span> a) <span class="kw">AS</span> q3</span>
+<span id="cb41-14"><a href="#cb41-14" aria-hidden="true" tabindex="-1"></a>   <span class="kw">FROM</span> t1</span>
+<span id="cb41-15"><a href="#cb41-15" aria-hidden="true" tabindex="-1"></a>),</span>
+<span id="cb41-16"><a href="#cb41-16" aria-hidden="true" tabindex="-1"></a>row_summary_stats <span class="kw">AS</span></span>
+<span id="cb41-17"><a href="#cb41-17" aria-hidden="true" tabindex="-1"></a>(</span>
+<span id="cb41-18"><a href="#cb41-18" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> </span>
+<span id="cb41-19"><a href="#cb41-19" aria-hidden="true" tabindex="-1"></a> <span class="dv">1</span> <span class="kw">AS</span> <span class="kw">id</span>, </span>
+<span id="cb41-20"><a href="#cb41-20" aria-hidden="true" tabindex="-1"></a> <span class="st">'mean'</span> <span class="kw">AS</span> statistic, </span>
+<span id="cb41-21"><a href="#cb41-21" aria-hidden="true" tabindex="-1"></a> mean <span class="kw">AS</span> <span class="fu">value</span> </span>
+<span id="cb41-22"><a href="#cb41-22" aria-hidden="true" tabindex="-1"></a>  <span class="kw">FROM</span> summary_stats</span>
+<span id="cb41-23"><a href="#cb41-23" aria-hidden="true" tabindex="-1"></a><span class="kw">union</span> <span class="kw">all</span></span>
+<span id="cb41-24"><a href="#cb41-24" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> </span>
+<span id="cb41-25"><a href="#cb41-25" aria-hidden="true" tabindex="-1"></a> <span class="dv">2</span>, </span>
+<span id="cb41-26"><a href="#cb41-26" aria-hidden="true" tabindex="-1"></a> <span class="st">'median'</span>, </span>
+<span id="cb41-27"><a href="#cb41-27" aria-hidden="true" tabindex="-1"></a> <span class="fu">median</span> </span>
+<span id="cb41-28"><a href="#cb41-28" aria-hidden="true" tabindex="-1"></a>  <span class="kw">FROM</span> summary_stats</span>
+<span id="cb41-29"><a href="#cb41-29" aria-hidden="true" tabindex="-1"></a><span class="kw">UNION</span></span>
+<span id="cb41-30"><a href="#cb41-30" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> </span>
+<span id="cb41-31"><a href="#cb41-31" aria-hidden="true" tabindex="-1"></a> <span class="dv">3</span>, </span>
+<span id="cb41-32"><a href="#cb41-32" aria-hidden="true" tabindex="-1"></a> <span class="st">'minimum'</span>, </span>
+<span id="cb41-33"><a href="#cb41-33" aria-hidden="true" tabindex="-1"></a> <span class="fu">min</span> </span>
+<span id="cb41-34"><a href="#cb41-34" aria-hidden="true" tabindex="-1"></a>  <span class="kw">FROM</span> summary_stats</span>
+<span id="cb41-35"><a href="#cb41-35" aria-hidden="true" tabindex="-1"></a><span class="kw">UNION</span></span>
+<span id="cb41-36"><a href="#cb41-36" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> </span>
+<span id="cb41-37"><a href="#cb41-37" aria-hidden="true" tabindex="-1"></a> <span class="dv">4</span>, </span>
+<span id="cb41-38"><a href="#cb41-38" aria-hidden="true" tabindex="-1"></a> <span class="st">'maximum'</span>, </span>
+<span id="cb41-39"><a href="#cb41-39" aria-hidden="true" tabindex="-1"></a> <span class="fu">max</span> </span>
+<span id="cb41-40"><a href="#cb41-40" aria-hidden="true" tabindex="-1"></a>  <span class="kw">FROM</span> summary_stats</span>
+<span id="cb41-41"><a href="#cb41-41" aria-hidden="true" tabindex="-1"></a><span class="kw">UNION</span></span>
+<span id="cb41-42"><a href="#cb41-42" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> </span>
+<span id="cb41-43"><a href="#cb41-43" aria-hidden="true" tabindex="-1"></a> <span class="dv">5</span>, </span>
+<span id="cb41-44"><a href="#cb41-44" aria-hidden="true" tabindex="-1"></a> <span class="st">'range'</span>, </span>
+<span id="cb41-45"><a href="#cb41-45" aria-hidden="true" tabindex="-1"></a> <span class="kw">range</span> </span>
+<span id="cb41-46"><a href="#cb41-46" aria-hidden="true" tabindex="-1"></a>  <span class="kw">FROM</span> summary_stats</span>
+<span id="cb41-47"><a href="#cb41-47" aria-hidden="true" tabindex="-1"></a><span class="kw">UNION</span></span>
+<span id="cb41-48"><a href="#cb41-48" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> </span>
+<span id="cb41-49"><a href="#cb41-49" aria-hidden="true" tabindex="-1"></a> <span class="dv">6</span>, </span>
+<span id="cb41-50"><a href="#cb41-50" aria-hidden="true" tabindex="-1"></a> <span class="st">'standard deviation'</span>, </span>
+<span id="cb41-51"><a href="#cb41-51" aria-hidden="true" tabindex="-1"></a> standard_deviation </span>
+<span id="cb41-52"><a href="#cb41-52" aria-hidden="true" tabindex="-1"></a>  <span class="kw">FROM</span> summary_stats</span>
+<span id="cb41-53"><a href="#cb41-53" aria-hidden="true" tabindex="-1"></a><span class="kw">UNION</span></span>
+<span id="cb41-54"><a href="#cb41-54" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> </span>
+<span id="cb41-55"><a href="#cb41-55" aria-hidden="true" tabindex="-1"></a> <span class="dv">7</span>, </span>
+<span id="cb41-56"><a href="#cb41-56" aria-hidden="true" tabindex="-1"></a> <span class="st">'variance'</span>, </span>
+<span id="cb41-57"><a href="#cb41-57" aria-hidden="true" tabindex="-1"></a> <span class="fu">variance</span> </span>
+<span id="cb41-58"><a href="#cb41-58" aria-hidden="true" tabindex="-1"></a>  <span class="kw">FROM</span> summary_stats</span>
+<span id="cb41-59"><a href="#cb41-59" aria-hidden="true" tabindex="-1"></a><span class="kw">UNION</span></span>
+<span id="cb41-60"><a href="#cb41-60" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> </span>
+<span id="cb41-61"><a href="#cb41-61" aria-hidden="true" tabindex="-1"></a> <span class="dv">9</span>, </span>
+<span id="cb41-62"><a href="#cb41-62" aria-hidden="true" tabindex="-1"></a> <span class="st">'Q1'</span>, </span>
+<span id="cb41-63"><a href="#cb41-63" aria-hidden="true" tabindex="-1"></a> q1 </span>
+<span id="cb41-64"><a href="#cb41-64" aria-hidden="true" tabindex="-1"></a>  <span class="kw">FROM</span> summary_stats</span>
+<span id="cb41-65"><a href="#cb41-65" aria-hidden="true" tabindex="-1"></a><span class="kw">UNION</span></span>
+<span id="cb41-66"><a href="#cb41-66" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> </span>
+<span id="cb41-67"><a href="#cb41-67" aria-hidden="true" tabindex="-1"></a> <span class="dv">10</span>, </span>
+<span id="cb41-68"><a href="#cb41-68" aria-hidden="true" tabindex="-1"></a> <span class="st">'Q3'</span>, </span>
+<span id="cb41-69"><a href="#cb41-69" aria-hidden="true" tabindex="-1"></a> q3 </span>
+<span id="cb41-70"><a href="#cb41-70" aria-hidden="true" tabindex="-1"></a>  <span class="kw">FROM</span> summary_stats</span>
+<span id="cb41-71"><a href="#cb41-71" aria-hidden="true" tabindex="-1"></a><span class="kw">UNION</span></span>
+<span id="cb41-72"><a href="#cb41-72" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> </span>
+<span id="cb41-73"><a href="#cb41-73" aria-hidden="true" tabindex="-1"></a> <span class="dv">11</span>, </span>
+<span id="cb41-74"><a href="#cb41-74" aria-hidden="true" tabindex="-1"></a> <span class="st">'IQR'</span>, </span>
+<span id="cb41-75"><a href="#cb41-75" aria-hidden="true" tabindex="-1"></a> (q3 <span class="op">-</span> q1) </span>
+<span id="cb41-76"><a href="#cb41-76" aria-hidden="true" tabindex="-1"></a>  <span class="kw">FROM</span> summary_stats</span>
+<span id="cb41-77"><a href="#cb41-77" aria-hidden="true" tabindex="-1"></a><span class="kw">UNION</span></span>
+<span id="cb41-78"><a href="#cb41-78" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> </span>
+<span id="cb41-79"><a href="#cb41-79" aria-hidden="true" tabindex="-1"></a> <span class="dv">12</span>, </span>
+<span id="cb41-80"><a href="#cb41-80" aria-hidden="true" tabindex="-1"></a> <span class="st">'skewness'</span>, </span>
+<span id="cb41-81"><a href="#cb41-81" aria-hidden="true" tabindex="-1"></a> <span class="fu">ROUND</span>(<span class="dv">3</span> <span class="op">*</span> (mean <span class="op">-</span> <span class="fu">median</span>):<span class="ch">:NUMERIC</span> <span class="op">/</span> standard_deviation, <span class="dv">2</span>) <span class="kw">AS</span> skewness </span>
+<span id="cb41-82"><a href="#cb41-82" aria-hidden="true" tabindex="-1"></a>  <span class="kw">FROM</span> summary_stats</span>
+<span id="cb41-83"><a href="#cb41-83" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb41-84"><a href="#cb41-84" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="op">*</span> </span>
+<span id="cb41-85"><a href="#cb41-85" aria-hidden="true" tabindex="-1"></a> <span class="kw">FROM</span> row_summary_stats</span>
+<span id="cb41-86"><a href="#cb41-86" aria-hidden="true" tabindex="-1"></a>  <span class="kw">ORDER</span> <span class="kw">BY</span> <span class="kw">id</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="execution-order" class="level2">

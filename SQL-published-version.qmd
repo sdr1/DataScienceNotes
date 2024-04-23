@@ -27,9 +27,9 @@ format:
 
 ## Preliminaries
 
-First we're going to create a few datasets that we'll use to show what SQL can do
+First we're going to create a few datasets using r.  The majority of the tutorial doesn't use them because the combination of SQL and Quarto is a bit buggy but it's a useful exercise anyway.
 
-```{r, intro, echo=FALSE, message=FALSE}
+```{r, intro, echo=TRUE, message=FALSE}
 library(odbc)
 library(tidyverse)
 library(DBI)
