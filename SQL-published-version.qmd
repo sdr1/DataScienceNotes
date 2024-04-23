@@ -1,0 +1,702 @@
+---
+title: "SQL"
+author: "Steven Rashin"
+date: "`r Sys.Date()`"
+execute: 
+  cache: true
+project:
+  type: website
+  output-dir: docs
+format:
+  html:
+    page-layout: full
+    toc: true
+    grid:
+      sidebar-width: 350px
+    theme: cosmo
+  pdf:
+    documentclass: scrreprt
+    include-in-header: 
+      text: |
+        \usepackage{makeidx}
+        \makeindex
+    include-after-body: 
+      text: |
+        \printindex
+---
+
+## Preliminaries
+
+First we're going to create a few datasets that we'll use to show what SQL can do
+
+```{r, intro, echo=FALSE}
+library(odbc)
+library(tidyverse)
+library(DBI)
+library(here)
+library(RSQLite)
+
+here::i_am("DataScienceNotes/SQL-published-version.qmd")
+```
+
+```{r create data, eval = T}
+sample_data <- tibble(
+  id = 1:1000,
+  x1 = rnorm(1000, 0, 1),
+  x2 = rnorm(1000, 10, 15),
+  y = 3 * x1 + 4 * x2 + rnorm(1000, 0, 10),
+  g = rbinom(1000, size = 1, prob = 0.3)
+)
+sample_data2 <- tibble(
+  id = 1:1000,
+  x3 = rnorm(1000, 15, 30),
+  x4 = rnorm(1000, 20, 5),
+  y2 = 10 * x3 + 40 * x4 + rnorm(1000, 0, 40),
+  g2 = rbinom(1000, size = 1, prob = 0.3)
+)
+
+mydb <- dbConnect(RSQLite::SQLite(), "sample.sqlite")
+
+dbWriteTable(conn = mydb, name = "sample", value = sample_data, overwrite = T)
+dbWriteTable(conn = mydb, name = "other_sample", value = sample_data2, overwrite = T)
+
+#### Try to load in postgresql - doesn't currently work
+
+# https://caltechlibrary.github.io/data-carpentry-R-ecology-lesson/05-r-and-databases.html
+# https://jtr13.github.io/cc21fall2/how-to-integrate-r-with-postgresql.html
+# https://solutions.posit.co/connections/db/databases/postgresql/
+#https://medium.com/geekculture/a-simple-guide-on-connecting-rstudio-to-a-postgresql-database-9e35ccdc08be
+```
+
+```{r, connect to sql}
+mydb <- dbConnect(RSQLite::SQLite(), "sample.sqlite")
+
+dbListTables(mydb) # returns a list of tables in your database
+```
+
+## Basic Syntax
+
+The basic syntax is you `SELECT` variables `FROM` a database.
+
+$$\underbrace{\text{SELECT }}_{\text{Select vars}} \underbrace{\text{*}}_{\text{* is all variables}}$$
+
+$$\underbrace{\text{FROM }}_{\text{from where}} \underbrace{\text{db\_name}}_{\text{name}}$$
+
+See e.g.,
+
+```{sql, connection = "mydb", eval = F}
+mydb <- dbConnect(RSQLite::SQLite(), "sample.sqlite")
+
+SELECT *
+FROM sample
+```
+
+You can run these commands in r using the following syntax. Since you can't run the sql commands in quarto without compiling, I've used this method to check that my sql commands actually work.
+
+```{r, r-to-sql, eval = T}
+mydb <- dbConnect(RSQLite::SQLite(), "sample.sqlite")
+
+dbGetQuery(mydb,'
+  select *
+  from "sample"
+  limit 10
+')
+```
+
+This can be modified (obviously!). Suppose you need two variables, `x1` and `x2`.
+
+```{sql, connection = "mydb"}
+SELECT x1, x2
+FROM sample
+```
+
+Here's a more advanced query where we select rows where `var_1` $> 10$
+
+```{sql, connection = "mydb"}
+SELECT x1, x2
+FROM sample
+WHERE x2 >= 10
+```
+
+Often you need summaries or operations by group `var_1` $> 10$:
+
+```{sql, eval = F}
+SELECT avg(var1)
+FROM db_name
+GROUP BY group_var
+HAVING var2 > 0
+```
+
+```{r, connection = "mydb"}
+mydb <- dbConnect(RSQLite::SQLite(), "sample.sqlite")
+
+dbGetQuery(mydb,'
+  select avg("x1")
+  from "sample"
+  group by "g"
+  having x2 >= 0
+')
+```
+
+What is the difference? `HAVING` applies to groups as a whole whereas `WHERE` applies to individual rows. If you have both, the `WHERE` clause is applied first, the `GROUP BY` clause is second - so only the individual rows that meet the `WHERE` clause are grouped. The `HAVING` clause is then applied to the output. Then only the groups that meet the `HAVING` condition will appear.
+
+Suppose you need both:
+
+```{sql having-eg, eval = F}
+SELECT AVG(var_3)
+FROM db_name
+WHERE var1 >= 10
+GROUP BY group_var
+HAVING var_2 > 5
+```
+
+
+Above you'll get the average of variable 3 from $db\_name$ only for the individual rows where $var\_1$ is greater than 10 grouped by group_var where, within the groups their associated $var\_2$ value is greater than 5.
+
+```{r, connection = "mydb"}
+mydb <- dbConnect(RSQLite::SQLite(), "sample.sqlite")
+
+dbGetQuery(mydb,'
+  select avg("y")
+  from "sample"
+  where "x1" >= 3 
+  group by "g"
+  having x2 >= 0
+')
+```
+
+## Data types
+
+Here are a few common data types. For a full list go to <https://www.postgresql.org/docs/current/datatype.html>.
+
+| Data Type | What does it do?                          |
+|-----------|-------------------------------------------|
+| int       | signed four-byte integer                  |
+| numeric   | exact number. use when dealing with money |
+| varchar   | variable-length character string          |
+| time      | time of day (no time zone)                |
+| timestamp | date and time (no time zone)              |
+| date      | calendar date (year, month, day)          |
+
+: Data Types {.striped .hover }
+
+For a technical discussion of the difference between float4 and float8 see this post: <https://stackoverflow.com/questions/16889042/postgresql-what-is-the-difference-between-float1-and-float24>.
+
+## NULLS
+
+Use `IS NOT NULL` to get rid of nulls.  Usually used after the `WHERE` clause.
+
+## Aliasing
+
+Sometimes you need to alias variables. This is especially necessary when merging as you can overwrite columns that have the same name that aren't explicitly part of the merge.
+
+```{sql, eval = F}
+SELECT var AS new_var_name
+FROM ...
+```
+
+You can also alias data frames - this is useful when you have multiple data frames.  
+
+```{sql, eval = F}
+SELECT var AS new_var_name
+FROM df1 a 
+```
+
+```{r, connection = "mydb"}
+mydb <- dbConnect(RSQLite::SQLite(), "sample.sqlite")
+
+dbGetQuery(mydb,'
+  select "g" as "group", ROUND(avg("y"),2) as "new_average"
+  from "sample" "b"
+  group by "g"
+  having "x2" >= 0
+')
+```
+
+
+## Converting Data Types
+
+Sometimes the data is in one format and you need it in another. You can use `CAST` to do this
+
+```{sql, eval = F}
+CAST(variable AS int/numeric/varcar/time)
+```
+
+Sometimes you need to get rid of nulls, to do that use `COALESCE`
+
+```{sql, eval = F}
+COALESCE(variable, 0)
+```
+
+## Extracting
+
+A lot of times when dealing with dates you'll need a range or only part of the information given. To extract this data, you need the command `extract`.
+
+This extracts a year from a date:
+
+```{sql, eval = F}
+EXTRACT(Year from date_var)
+```
+
+This extracts an epoch (i.e. the time difference) between the end date and the start date:
+
+```{sql, eval = F}
+EXTRACT(EPOCH from endvar-startvar)
+```
+
+Suppose, however, that you only want the days in the epoch. That's surprisingly easy with the following code:
+
+```{sql, eval = F}
+EXTRACT(Day from endvar-startvar)
+```
+
+## Aggregate Functions {#sec-aggregate}
+
+Note that in the table below all of the functions EXCEPT count ignore null values.
+
+| Aggregate Fcn          | What does it do?                                                                                                                                         |
+|:-------------------------|:---------------------------------------------|
+| `MIN()`                | returns the smallest value within the selected column                                                                                                    |
+| `MAX()`                | returns the largest value within the selected column                                                                                                     |
+| `COUNT()`              | returns the number of rows in a set                                                                                                                      |
+| `SUM()`                | returns the total sum of a numerical column                                                                                                              |
+| `AVG()`                | returns the *mean* value of a numerical column. Getting the median requires `PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY var1)`. See below for more info |
+| `GREATEST(var1, var2)` | Greatest rowwise among var1 and var2                                                                                                                     |
+| `LEAST(var1, var2)`    | Least rowwise among var1 and var2                                                                                                                        |
+
+: Aggregate Types {.striped .hover tbl-colwidths="\[15,85\]"}
+
+Before we go on, a brief digression on getting the median. For reasons known only to the creators of SQL, getting the median is fantastically difficult. Suppose you want the median as a decimal rounded to the second significant digit. You'd need to write `ROUND(PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY var1)::DECIMAL, 2)`.[^1]
+
+[^1]: If you ask why, I'll give you my favorite coding answer.
+
+The functions `MIN()` to `AVG()` operate globally but sometimes you need the biggest/smallest out of a single record (i.e. locally/within a row). You can do that with `GREATEST()` and `LEAST()`. Note that these also work on characters. An example will help clarify.
+
+Suppose you want to see the number of flights between a pair of cities (e.g. Austin and Dallas) but you don't care about where the plane begins. In this case the command `CONCAT(departure_city, '-' arrival_city)`[^2] will create **2** separate entries for Austin-Dallas and Dallas-Austin which is not what the question asked for. So you have to use `GREATEST` and `LEAST`.
+
+[^2]: See @sec-text for more details
+
+Greatest gets the highest alphabetically/greatest date/number out of a variable PER RECORD (i.e per row). Max gets the most **OVER ALL RECORDS**. Why does this difference matter? Suppose Abilene and Amarillo are in the data. Then if you used `MAX()` every row would be in the Abilene and Amarillo group.
+
+Going back to our Dallas/Austin example, `GREATEST(departure_city, arrival_city)` would give us `Austin` and `LEAST(departure_city, arrival_city)` gives us `Dallas` in a row with a flight from Austin to Dallas. In a row with a flight from Austin to London the command would give us `Austin` and `London`. So to combine these to create a unique ID, we could type `CONCAT(GREATEST(destination_location, source_location),'-',LEAST(destination_location, source_location))` and that would give us `Austin-Dallas` whenever the these two cities appeared in destination location and source location.
+
+### Percentiles
+
+As you could see from above, extracting the median is difficult. If you want a bunch of percentiles, the problem is even worse.
+
+```{sql percentiles, eval = F}
+SELECT 
+UNNEST(array[0, 0.25, 0.5, 0.75, 1]) AS percentile, 
+UNNEST(PERCENTILE_CONT(array[0, 0.25, 0.5, 0.75, 1]) within group (order by var1)) <---- Note that unnest wraps the whole thing!  
+FROM ...
+
+```
+
+You have two options for calculating percentiles `PERCENTILE_CONT` and `PERCENTILE_DISC`. `PERCENTILE_CONT` will interpolate values while `PERCENTILE_DISC` will give you values only from your data. Suppose you have 2,3,4,5. PERCENTILE_CONT would give you 3.5, PERCENTILE_DISC gives you 3.
+
+## Merging
+
+There are four types of joins:
+
+-   INNER JOIN/JOIN
+    -   Joins all common records between tables
+-   LEFT JOIN
+    -   Joins the matching records in the right frame (i.e. the one after the LEFT JOIN clause) with all the records in the left frame (i.e. the one after the FROM clause)
+-   RIGHT JOIN
+    -   Joins all of the records in the right frame (i.e. the one after the RIGHT JOIN clause) with all the matching records in the left frame (i.e. the one after the FROM clause)
+-   FULL JOIN
+    -   All the records in both frames
+
+These joins are all on some variable.
+
+```{sql join, eval = F}
+SELECT a.var1, a.var2, a.id, b.var3, b.var4, b.id1 <---- note the aliases up here.  This is good practice to show where you're getting each variable from
+FROM df1 a <---- alias dataframe 1 as a
+INNER JOIN df2 b <----- alias dataframe 2 as b
+ON a.id = b.id
+```
+
+You can use `OR` in the join to join on either value.  `AND` works too.
+
+```{sql join2, eval = F}
+SELECT a.var1, a.var2, a.id, a.id2, b.var3, b.var4, b.id1, b.alt_id <---- note the aliases up here.  This is good practice to show where you're getting each variable from
+FROM df1 a <---- alias dataframe 1 as a
+INNER JOIN df2 b <----- alias dataframe 2 as b
+ON a.id = b.id OR a.var1 = b.alt_id <---- this joins if EITHER is true
+```
+
+
+-   UNION
+    -   Concatenates queries. Does not allow duplicates
+    
+```{sql union-example, eval = F}
+SELECT ...
+FROM ...
+UNION
+SELECT ...
+FROM ...
+```
+    
+-   UNION ALL
+    -   Concatenates queries. Allows duplicates
+
+
+
+## Window Functions
+
+Suppose you need to do something within a window like find all flights within 3 days. Here you need a window function. The basic syntax is as follows:
+
+$\underbrace{\dots}_{\text{Some fcn}} \text{OVER} ($
+
+$\hspace{0.5cm}\underbrace{\text{PARTITION BY} {\color{blue}{\text{var1}}}}_{\text{group by }{\color{blue}{\text{var1}}}}$
+
+$\hspace{0.5cm}\underbrace{\text{ORDER BY} {\color{green}{\text{var2}}}}_{\text{order by }{\color{green}{\text{var2}}}}$ $) \text{ AS newvar}$
+
+In addition to the functions in @sec-aggregate, here are a bunch of useful functions. For a more comprehensive list, go to <https://www.postgresql.org/docs/current/functions-window.html>
+
+| Window Function | What does it do?                                                                                                                             |
+|:-------------------------|:---------------------------------------------|
+| `lag()`         | lags the data 1, lag(2) would lag 2 rows                                                                                                     |
+| `lead()`        | opposite of lag()                                                                                                                            |
+| `rank()`        | ranks rows. Suppose you have two rows tied for first, the rankings would go 1,1,3                                                            |
+| `dense_rank()`  | ranks rows without skipping.Suppose you have two rows tied for first, the rankings would go 1,1,2                                            |
+| `ntile()`       | splits the data into n groups, indexed by an integer, as equally as possible. `ntile(4)` for example, gives us quartiles if ordered properly |
+| `cume_dist()`   | cumulative distribution                                                                                                                      |
+
+: Window Functions {.striped .hover tbl-colwidths="\[15,85\]"}
+
+### Bounding window functions
+
+Sometimes you need to search within a certain **window** in a group as opposed to within an entire group. Suppose we wanted a moving average within the last three years. We could do that by properly bounding our query. The bounds come after the `ORDER BY` clause.
+
+```{sql, eval = F}
+SELECT AVG(var1) OVER  <---- give us the mean of variable 1
+ (  
+ PARTITION BY country <---- group by country
+ ORDER BY year desc <---- order by year descending
+ ROWS BETWEEN 2 PRECEDING AND CURRENT ROW <---- gives us the last 3 years.  includes the current row.
+)
+FROM df1
+```
+
+We can be fairly creative with the bounds using the following building blocks:
+
+| Bounds                        | What does it do?                                                    |
+|:-------------------------|:---------------------------------------------|
+| `n PRECEDING`                 | 2 Preceding gives us the 2 prior rows not including the current row |
+| `UNBOUND PRECEDING`           | All rows up to but not including the current row                    |
+| `CURRENT ROW`                 | Just the current row                                                |
+| `n PRECEDING AND CURRENT ROW` | n preceding and the current row                                     |
+| `n FOLLOWING`                 | n following but not including the current row                       |
+| `UNBOUND FOLLOWING`           | n preceding and the current row                                     |
+
+## Conditionals
+
+Sometimes you don't just need an average, you need a conditional average or sum. This can be done with the `FILTER` command
+
+```{sql, eval = F}
+sum(var) FILTER(WHERE ...) AS ...
+```
+
+Sometimes you need to create a new variable based on the values of other variables. You do that with `CASE WHEN`
+
+```{sql, eval = F}
+CASE 
+  WHEN [condition] THEN [result]
+  WHEN [condition2] THEN [result2]
+  ELSE [result3] END AS new_conditional_variable  
+```
+
+Note that the `CASE WHEN ...` can be used in the `GROUP BY` command to create groups.
+
+## Dates
+
+Dates are difficult to deal with. You just have to memorize these commands.
+
+| Function                                               | What does it do?              |
+|:-------------------------|:---------------------------------------------|
+| `MAKE_DATE(year,month,day)`                            | makes dates                   |
+| `MAKE_TIMESTAMP(year,month,day, hour, minute, second)` | makes timestamps              |
+| `MAKE_INTERVAL(year,month,day, hour, minute, second)`  | makes intervals               |
+| `DATE(datetime_var)`                                   | extracts dates from datetimes |
+
+: Datetime Functions {.striped .hover tbl-colwidths="\[55,45\]"}
+
+There are variations. Suppose you wanted to find all processes that lasted less than 10 days. You could use the command `MAKE_INTERVAL(days <= 10)`
+
+## Common Table Expressions {#sec-cte}
+
+Sometimes you need to create a separate table that you can then extract data from to avoid conflicts like using a window function in the `WHERE` clause. You do this with a common table expression (CTE).
+
+The basic syntax is as follows:
+
+```{sql cte-plain, eval = FALSE}
+WITH cte1 AS (
+SELECT ...
+FROM db1
+)
+
+SELECT ...
+FROM ... (likely db1 or db2)
+```
+
+You're not limited to one CTE, you can have multiple if you want:
+
+```{sql ctwx2, eval = F}
+WITH RECURSIVE cte1 AS (
+SELECT ...
+FROM db1
+), <---- need the parenthesis and comma here otherwise you get an error!
+cte2 AS (
+SELECT ...
+FROM db2
+)
+
+SELECT ...
+FROM ... (likely db1 or db2)
+```
+
+Below is an an example of using CTEs to avoid a window function in the `WHERE` clause.[^3] The query is from a problem that asks you to find the second longest flight between two cities. This is a bit of a tricky problem because it requries a window function, concatentaion, ordering text strings, and a common table expression.
+
+[^3]: See <https://www.interviewquery.com/questions/second-longest-flight> for full problem details
+
+```{sql, eval = F}
+WITH tmp AS (SELECT 
+id, 
+destination_location,
+source_location,
+flight_start,
+flight_end,
+dense_rank() OVER (
+    PARTITION BY CONCAT(GREATEST(destination_location, source_location),'.',LEAST(destination_location, source_location))
+    ORDER BY extract(epoch from flight_end - flight_start) desc
+) AS flight_duration
+FROM flights)
+
+SELECT id, destination_location, source_location, flight_start, flight_end
+FROM tmp
+where flight_duration = 2
+order by id
+```
+
+Let's go through this, starting with the structure. Here we're creating a common table expression called cte and then using it
+
+$\text{WITH } {\color{red}{\text{tmp}}} \text{ AS (} \leftarrow \text{Create CTE called } \color{red}{\text{tmp}}$\
+$\hspace{1cm}\text{SELECT} \dots \leftarrow \text{Standard SQL commands in here}$\
+$\hspace{1cm}\text{FROM} \dots$\
+$) \leftarrow \text{Close out CTE}$
+
+$\text{SELECT} \dots$\
+$\text{FROM } {\color{red}{\text{tmp}}} \leftarrow \text{Use } {\color{red}{\text{tmp}}} \text{ as a normal table}$
+
+The other tricky bit is the window function. Here we're using a dense rank (i.e. ranking everything sequentially so if two are tied for first the ranks are 1,1,2) by city pair (that's the variable after partition by) ordering those groups by flight time descending.
+
+## Subqueries
+
+Suppose you need a one off query within a query. You can use a sub query! The basic syntax is below. You can put them anywhere. For example, here's one in the `FROM` clause. Note that you need to alias your subqueries or else they'll fail
+
+```{sql, eval = F}
+SELECT ...
+FROM (
+  SELECT *
+  FROM db1
+) AS db2
+```
+
+You could, however, do one in the `SELECT` clause if you wanted
+
+```{sql, eval = F}
+SELECT (
+  SELECT ...
+  FROM ...
+)
+FROM db1
+```
+
+So when to use common table expressions versus subtables? Common table expressions are, generally, preferred because they're more readable and can be used multiple times. See, e.g., below, where we havethe same query as @sec-cte but with a subquery instead of a common table expression.
+
+```{sql, eval = F}
+
+SELECT 
+id, 
+destination_location,
+source_location,
+flight_start,
+flight_end
+FROM (
+    SELECT 
+    *,  
+dense_rank() OVER (
+    PARTITION BY CONCAT(GREATEST(destination_location, source_location),'.',LEAST(destination_location, source_location))
+    ORDER BY extract(epoch from flight_end - flight_start) desc) AS duration_rank
+    FROM flights
+    ) AS subquery
+
+WHERE duration_rank = 2
+order by id
+```
+
+### Subquery Joins
+
+Sometimes you need to do something to a database before joining it. Here a subquery join is helpful
+
+```{sql sub-q-join, eval = F}
+SELECT user_id, var1, var2 
+FROM  db1
+LEFT JOIN 
+    ( <---- begin subquery 
+        SELECT id, var3, var4
+        FROM db2
+        WHERE ... <-----  you're using a subquery because you need to do something so I've included the where in here 
+    ) AS a <--- end and alias subquery 
+ON db1.user_id = a.id <---- join on subquery name!
+```
+
+## Text {#sec-text}
+
+Sometimes you're faced with a task where you have to concatenate (i.e. join) or split variables. I've seen this problem when trying to match pairs of cities for flights when the question only cares about the pair and not the ordering.
+
+$\text{CONCAT(var1, var2)}$
+
+$\underbrace{\text{SPLIT\_PART}}_{\text{split apart}}(\underbrace{{\color{red}{\text{var}}, {\color{blue}{\text{'.'}}}, {\color{green}{\text{1}}}}}_{\text{split apart}{\color{red}{\text{ var}}} \text{ on}{\color{blue}{\text{ a period}}} \text{ taking }{\color{green}{\text{the first instance}}} })$
+
+## Random Sample
+
+The method below selects 10% of the data.
+
+```{sql random-sample, eval = F}
+SELECT ...
+FROM ...
+TABLESAMPLE BERNOULLI(10)
+```
+
+## Summary Statistics
+
+Getting summary statistics is a pain the ass. So here is some code that will do it for a variable called $a$ in database $t1$. The difficulty of the code is that it requires two separate common table expressions. Here's a sketch of what that looks like. Note that adding RECURSIVE to the with query allows you to select from db1 in the db2 query.
+
+```{sql show-cte-x2-again, eval = F}
+WITH RECURSIVE cte1 AS (
+SELECT ...
+FROM db1
+),
+cte2 AS (
+SELECT ...
+FROM db2
+)
+
+SELECT ...
+FROM ... (likely db1 or db2)
+```
+
+```{sql summary-stats, eval = F}
+WITH RECURSIVE
+summary_stats AS
+(
+ SELECT 
+  ROUND(AVG(a), 2) AS mean,
+  PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY a) AS median,
+  MIN(a) AS min,
+  MAX(a) AS max,
+  MAX(a) - MIN(a) AS range,
+  ROUND(STDDEV(a), 2) AS standard_deviation,
+  ROUND(VARIANCE(a), 2) AS variance,
+  PERCENTILE_CONT(0.25) WITHIN GROUP (ORDER BY a) AS q1,
+  PERCENTILE_CONT(0.75) WITHIN GROUP (ORDER BY a) AS q3
+   FROM t1
+),
+row_summary_stats AS
+(
+SELECT 
+ 1 AS id, 
+ 'mean' AS statistic, 
+ mean AS value 
+  FROM summary_stats
+union all
+SELECT 
+ 2, 
+ 'median', 
+ median 
+  FROM summary_stats
+UNION
+SELECT 
+ 3, 
+ 'minimum', 
+ min 
+  FROM summary_stats
+UNION
+SELECT 
+ 4, 
+ 'maximum', 
+ max 
+  FROM summary_stats
+UNION
+SELECT 
+ 5, 
+ 'range', 
+ range 
+  FROM summary_stats
+UNION
+SELECT 
+ 6, 
+ 'standard deviation', 
+ standard_deviation 
+  FROM summary_stats
+UNION
+SELECT 
+ 7, 
+ 'variance', 
+ variance 
+  FROM summary_stats
+UNION
+SELECT 
+ 9, 
+ 'Q1', 
+ q1 
+  FROM summary_stats
+UNION
+SELECT 
+ 10, 
+ 'Q3', 
+ q3 
+  FROM summary_stats
+UNION
+SELECT 
+ 11, 
+ 'IQR', 
+ (q3 - q1) 
+  FROM summary_stats
+UNION
+SELECT 
+ 12, 
+ 'skewness', 
+ ROUND(3 * (mean - median)::NUMERIC / standard_deviation, 2) AS skewness 
+  FROM summary_stats
+)
+SELECT * 
+ FROM row_summary_stats
+  ORDER BY id;
+```
+
+## Execution Order
+
+1.  JOIN
+    -   If no JOIN, then we start at FROM
+2.  FROM
+3.  WHERE
+4.  GROUP BY
+5.  HAVING
+6.  SELECT
+7.  DISTINCT
+8.  ORDER BY
+9.  LIMIT/OFFSET
+
+### More Efficient Code
+
+-   <https://nodeteam.medium.com/how-to-optimize-postgresql-queries-226e6ff15f72>
+-   Properly index\* columns used in WHERE and JOIN conditions.
+    -   Index will create a pointer to the actual rows in the specified table.
+    -   <https://www.postgresql.org/docs/current/sql-createindex.html>
+-   Use appropriate data types and avoid unnecessary data type conversions.
+-   Limit the use of SELECT \* and only retrieve the columns you need.
+-   Minimize the use of subqueries and consider JOIN alternatives.
+-   Monitor and analyze query performance using database-specific tools and profiling."
