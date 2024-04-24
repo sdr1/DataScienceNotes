@@ -27,7 +27,7 @@ format:
 
 ## Preliminaries
 
-First we're going to create a few datasets using r.  The majority of the tutorial doesn't use them because the combination of SQL and Quarto is a bit buggy but it's a useful exercise anyway.
+First we're going to create a few datasets using r. The majority of the tutorial doesn't use them because the combination of SQL and Quarto is a bit buggy but it's a useful exercise anyway.
 
 ```{r, intro, echo=TRUE, message=FALSE}
 library(odbc)
@@ -84,11 +84,10 @@ $$\underbrace{\text{FROM }}_{\text{from where}} \underbrace{\text{db\_name}}_{\t
 
 See e.g.,
 
-```{sql, connection = "mydb", eval = F}
-mydb <- dbConnect(RSQLite::SQLite(), "sample.sqlite")
-
-SELECT *
-FROM sample
+```{sql basic-sql, connection = "mydb", eval = F}
+SELECT * ----- select all 
+FROM sample ----- select from this dataframe
+LIMIT 10 ----- for demo purposes, limit output to 10 rows
 ```
 
 You can run these commands in r using the following syntax. Since you can't run the sql commands in quarto without compiling, I've used this method to check that my sql commands actually work.
@@ -105,7 +104,8 @@ dbGetQuery(mydb,'
 
 This can be modified (obviously!). Suppose you need two variables, `x1` and `x2`.
 
-```{sql, connection = "mydb"}
+```{sql, eval = F}
+#| connection: mydb
 SELECT x1, x2
 FROM sample
 ```
@@ -118,7 +118,17 @@ FROM sample
 WHERE x2 >= 10
 ```
 
-Often you need summaries or operations by group `var_1` $> 10$:
+```{r see above query, eval = T}
+#| connection: mydb
+
+dbGetQuery(mydb,'
+  select "x1","x2"
+  from "sample"
+  limit 10
+')
+```
+
+Often you need summaries or operations by group. This is easy, just add the `GROUP BY` clause. Additionally you can perform an operation on the groups themselves using `HAVING`. Below, for example, we take the average of variable 1 by group having var2 \> 2
 
 ```{sql, eval = F}
 SELECT avg(var1)
@@ -149,7 +159,6 @@ WHERE var1 >= 10
 GROUP BY group_var
 HAVING var_2 > 5
 ```
-
 
 Above you'll get the average of variable 3 from $db\_name$ only for the individual rows where $var\_1$ is greater than 10 grouped by group_var where, within the groups their associated $var\_2$ value is greater than 5.
 
@@ -184,7 +193,7 @@ For a technical discussion of the difference between float4 and float8 see this 
 
 ## NULLS
 
-Use `IS NOT NULL` to get rid of nulls.  Usually used after the `WHERE` clause.
+Use `IS NOT NULL` to get rid of nulls. Usually used after the `WHERE` clause.
 
 ## Aliasing
 
@@ -195,7 +204,7 @@ SELECT var AS new_var_name
 FROM ...
 ```
 
-You can also alias data frames - this is useful when you have multiple data frames.  
+You can also alias data frames - this is useful when you have multiple data frames.
 
 ```{sql, eval = F}
 SELECT var AS new_var_name
@@ -209,10 +218,8 @@ dbGetQuery(mydb,'
   select "g" as "group", ROUND(avg("y"),2) as "new_average"
   from "sample" "b"
   group by "g"
-  having "x2" >= 0
 ')
 ```
-
 
 ## Converting Data Types
 
@@ -222,7 +229,7 @@ Sometimes the data is in one format and you need it in another. You can use `CAS
 CAST(variable AS int/numeric/varcar/time)
 ```
 
-Sometimes you need to get rid of nulls, to do that use `COALESCE`
+Sometimes you need to get rid of nulls and coerce them to zeroes, to do that use `COALESCE`
 
 ```{sql, eval = F}
 COALESCE(variable, 0)
@@ -270,7 +277,7 @@ Before we go on, a brief digression on getting the median. For reasons known onl
 
 [^1]: If you ask why, I'll give you my favorite coding answer.
 
-The functions `MIN()` to `AVG()` operate globally but sometimes you need the biggest/smallest out of a single record (i.e. locally/within a row). You can do that with `GREATEST()` and `LEAST()`. Note that these also work on characters. An example will help clarify.
+The functions `MIN()` to `AVG()` operate globally but sometimes you need the biggest/smallest out of a single record (i.e. locally/within a row). You can do that with `GREATEST()` and `LEAST()`. Note that these also work on characters. An example will help clarify why this feature is useful.
 
 Suppose you want to see the number of flights between a pair of cities (e.g. Austin and Dallas) but you don't care about where the plane begins. In this case the command `CONCAT(departure_city, '-' arrival_city)`[^2] will create **2** separate entries for Austin-Dallas and Dallas-Austin which is not what the question asked for. So you have to use `GREATEST` and `LEAST`.
 
@@ -278,7 +285,7 @@ Suppose you want to see the number of flights between a pair of cities (e.g. Aus
 
 Greatest gets the highest alphabetically/greatest date/number out of a variable PER RECORD (i.e per row). Max gets the most **OVER ALL RECORDS**. Why does this difference matter? Suppose Abilene and Amarillo are in the data. Then if you used `MAX()` every row would be in the Abilene and Amarillo group.
 
-Going back to our Dallas/Austin example, `GREATEST(departure_city, arrival_city)` would give us `Austin` and `LEAST(departure_city, arrival_city)` gives us `Dallas` in a row with a flight from Austin to Dallas. In a row with a flight from Austin to London the command would give us `Austin` and `London`. So to combine these to create a unique ID, we could type `CONCAT(GREATEST(destination_location, source_location),'-',LEAST(destination_location, source_location))` and that would give us `Austin-Dallas` whenever the these two cities appeared in destination location and source location.
+Going back to our Dallas/Austin example, `GREATEST(departure_city, arrival_city)` would give us `Austin` and `LEAST(departure_city, arrival_city)` gives us `Dallas` in a row with a flight from Austin to Dallas or in a row with a flight from Dallas to Austin. In a row with a flight from Austin to London the command would give us `Austin` and `London`. So to combine these to create a unique ID, we could type `CONCAT(GREATEST(destination_location, source_location),'-',LEAST(destination_location, source_location))` and that would give us `Austin-Dallas` whenever the these two cities appeared in destination location and source location.
 
 ### Percentiles
 
@@ -287,9 +294,8 @@ As you could see from above, extracting the median is difficult. If you want a b
 ```{sql percentiles, eval = F}
 SELECT 
 UNNEST(array[0, 0.25, 0.5, 0.75, 1]) AS percentile, 
-UNNEST(PERCENTILE_CONT(array[0, 0.25, 0.5, 0.75, 1]) within group (order by var1)) <---- Note that unnest wraps the whole thing!  
+UNNEST(PERCENTILE_CONT(array[0, 0.25, 0.5, 0.75, 1]) within group (order by var1)) ---- Note that unnest wraps the whole thing!  
 FROM ...
-
 ```
 
 You have two options for calculating percentiles `PERCENTILE_CONT` and `PERCENTILE_DISC`. `PERCENTILE_CONT` will interpolate values while `PERCENTILE_DISC` will give you values only from your data. Suppose you have 2,3,4,5. PERCENTILE_CONT would give you 3.5, PERCENTILE_DISC gives you 3.
@@ -310,13 +316,13 @@ There are four types of joins:
 These joins are all on some variable.
 
 ```{sql join, eval = F}
-SELECT a.var1, a.var2, a.id, b.var3, b.var4, b.id1 <---- note the aliases up here.  This is good practice to show where you're getting each variable from
-FROM df1 a <---- alias dataframe 1 as a
-INNER JOIN df2 b <----- alias dataframe 2 as b
+SELECT a.var1, a.var2, a.id, b.var3, b.var4, b.id1 ---- note the aliases up here.  This is good practice to show where you're getting each variable from
+FROM df1 a ---- alias dataframe 1 as a
+INNER JOIN df2 b ----- alias dataframe 2 as b
 ON a.id = b.id
 ```
 
-You can use `OR` in the join to join on either value.  `AND` works too.
+You can use `OR` in the join to join on either value. `AND` works too.
 
 ```{sql join2, eval = F}
 SELECT a.var1, a.var2, a.id, a.id2, b.var3, b.var4, b.id1, b.alt_id <---- note the aliases up here.  This is good practice to show where you're getting each variable from
@@ -325,10 +331,9 @@ INNER JOIN df2 b <----- alias dataframe 2 as b
 ON a.id = b.id OR a.var1 = b.alt_id <---- this joins if EITHER is true
 ```
 
-
 -   UNION
     -   Concatenates queries. Does not allow duplicates
-    
+
 ```{sql union-example, eval = F}
 SELECT ...
 FROM ...
@@ -336,11 +341,9 @@ UNION
 SELECT ...
 FROM ...
 ```
-    
+
 -   UNION ALL
     -   Concatenates queries. Allows duplicates
-
-
 
 ## Window Functions
 
@@ -398,7 +401,7 @@ Sometimes you don't just need an average, you need a conditional average or sum.
 sum(var) FILTER(WHERE ...) AS ...
 ```
 
-Sometimes you need to create a new variable based on the values of other variables. You do that with `CASE WHEN`
+You can create a new variable based on the values of other variables. You do that with `CASE WHEN`
 
 ```{sql, eval = F}
 CASE 
@@ -422,7 +425,7 @@ Dates are difficult to deal with. You just have to memorize these commands.
 
 : Datetime Functions {.striped .hover tbl-colwidths="\[55,45\]"}
 
-There are variations. Suppose you wanted to find all processes that lasted less than 10 days. You could use the command `MAKE_INTERVAL(days <= 10)`
+There are variations. Suppose you wanted to find all processes that lasted less than 10 days. You could use the command `MAKE_INTERVAL(days < 10)`
 
 ## Common Table Expressions {#sec-cte}
 
@@ -446,7 +449,7 @@ You're not limited to one CTE, you can have multiple if you want:
 WITH RECURSIVE cte1 AS (
 SELECT ...
 FROM db1
-), <---- need the parenthesis and comma here otherwise you get an error!
+), ---- need the parenthesis and comma here otherwise you get an error!
 cte2 AS (
 SELECT ...
 FROM db2
@@ -456,7 +459,7 @@ SELECT ...
 FROM ... (likely db1 or db2)
 ```
 
-Below is an an example of using CTEs to avoid a window function in the `WHERE` clause.[^3] The query is from a problem that asks you to find the second longest flight between two cities. This is a bit of a tricky problem because it requries a window function, concatentaion, ordering text strings, and a common table expression.
+Below is an an example of using CTEs to avoid a window function in the `WHERE` clause.[^3] The query is from a problem that asks you to find the second longest flight between two cities. This is a bit of a tricky problem because it requires a window function, concatentaion, ordering text strings, and a common table expression.
 
 [^3]: See <https://www.interviewquery.com/questions/second-longest-flight> for full problem details
 
@@ -491,6 +494,8 @@ $\text{FROM } {\color{red}{\text{tmp}}} \leftarrow \text{Use } {\color{red}{\tex
 
 The other tricky bit is the window function. Here we're using a dense rank (i.e. ranking everything sequentially so if two are tied for first the ranks are 1,1,2) by city pair (that's the variable after partition by) ordering those groups by flight time descending.
 
+$\underbrace{\text{dense_rank()}}_{\text{rank everything}} \underbrace{\text{OVER (}}_{\text{create the window}} \\ \underbrace{\text{PARTITION BY}}_{\text{select grouping var}} \hspace{0.2cm}\underbrace{\text{CONCAT(GREATEST(destination_location, source_location),'.',LEAST(destination_location, source_location))}}_{\text{group by city pair}} \\ \underbrace{\text{ORDER BY}}_{\text{select order var(s)}} \hspace{0.2cm}\underbrace{\text{extract(epoch from flight_end - flight_start) desc}}_{\text{order by duration descending}} \\ ) \underbrace{\text{AS flight_duration}}_{\text{Alias this to use later}}$
+
 ## Subqueries
 
 Suppose you need a one off query within a query. You can use a sub query! The basic syntax is below. You can put them anywhere. For example, here's one in the `FROM` clause. Note that you need to alias your subqueries or else they'll fail
@@ -513,20 +518,19 @@ SELECT (
 FROM db1
 ```
 
-So when to use common table expressions versus subtables? Common table expressions are, generally, preferred because they're more readable and can be used multiple times. See, e.g., below, where we havethe same query as @sec-cte but with a subquery instead of a common table expression.
+So when to use common table expressions versus subtables? Common table expressions are, generally, preferred because they're more readable and can be used multiple times. See, e.g., below, where we have the same query as @sec-cte but with a subquery instead of a common table expression.
 
 ```{sql, eval = F}
-
 SELECT 
 id, 
 destination_location,
 source_location,
 flight_start,
 flight_end
-FROM (
-    SELECT 
-    *,  
-dense_rank() OVER (
+FROM ( ----- create a subquery that has everything in the initial dataframe AND a rank
+    SELECT  ---- (ctd) column that we can use in a where clause because the subquery 
+    *,   ----- separates the window function from the where so you can just call the 
+dense_rank() OVER ( ---- duration rank column as usual
     PARTITION BY CONCAT(GREATEST(destination_location, source_location),'.',LEAST(destination_location, source_location))
     ORDER BY extract(epoch from flight_end - flight_start) desc) AS duration_rank
     FROM flights
@@ -544,12 +548,12 @@ Sometimes you need to do something to a database before joining it. Here a subqu
 SELECT user_id, var1, var2 
 FROM  db1
 LEFT JOIN 
-    ( <---- begin subquery 
+    ( ---- begin subquery 
         SELECT id, var3, var4
         FROM db2
-        WHERE ... <-----  you're using a subquery because you need to do something so I've included the where in here 
-    ) AS a <--- end and alias subquery 
-ON db1.user_id = a.id <---- join on subquery name!
+        WHERE ... -----  you're using a subquery because you need to do something so I've included the where in here 
+    ) AS a --- end and alias subquery 
+ON db1.user_id = a.id ---- join on subquery name!
 ```
 
 ## Text {#sec-text}
@@ -557,6 +561,12 @@ ON db1.user_id = a.id <---- join on subquery name!
 Sometimes you're faced with a task where you have to concatenate (i.e. join) or split variables. I've seen this problem when trying to match pairs of cities for flights when the question only cares about the pair and not the ordering.
 
 $\text{CONCAT(var1, var2)}$
+
+If you need visual separation between the values, you can always do something like:
+
+$\text{CONCAT(var1, '-', var2)}$
+
+To undo a split column, use the `split_part` clause.  Be careful here because you need to specify which part of the split you want to take!
 
 $\underbrace{\text{SPLIT\_PART}}_{\text{split apart}}(\underbrace{{\color{red}{\text{var}}, {\color{blue}{\text{'.'}}}, {\color{green}{\text{1}}}}}_{\text{split apart}{\color{red}{\text{ var}}} \text{ on}{\color{blue}{\text{ a period}}} \text{ taking }{\color{green}{\text{the first instance}}} })$
 
@@ -567,7 +577,7 @@ The method below selects 10% of the data.
 ```{sql random-sample, eval = F}
 SELECT ...
 FROM ...
-TABLESAMPLE BERNOULLI(10)
+TABLESAMPLE BERNOULLI(10) --- this is a faster way of sampling
 ```
 
 ## Summary Statistics

@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Steven Rashin">
-<meta name="dcterms.date" content="2024-04-23">
+<meta name="dcterms.date" content="2024-04-24">
 
 <title>SQL</title>
 <style>
@@ -137,7 +137,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">April 23, 2024</p>
+      <p class="date">April 24, 2024</p>
     </div>
   </div>
   
@@ -202,11 +202,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p><span class="math display">\[\underbrace{\text{SELECT }}_{\text{Select vars}} \underbrace{\text{*}}_{\text{* is all variables}}\]</span></p>
 <p><span class="math display">\[\underbrace{\text{FROM }}_{\text{from where}} \underbrace{\text{db\_name}}_{\text{name}}\]</span></p>
 <p>See e.g.,</p>
-<div class="cell" data-hash="SQL-published-version_cache/html/unnamed-chunk-1_d53f5624cef3d213d42daa6465d0761a">
+<div class="cell" data-hash="SQL-published-version_cache/html/unnamed-chunk-1_4d0ed93bb7b5bcb284488ce3466fbfb3">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>mydb <span class="op">&lt;-</span> dbConnect(RSQLite:<span class="ch">:SQLite</span>(), <span class="ot">"sample.sqlite"</span>)</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="op">*</span></span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> <span class="kw">sample</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="op">*</span> <span class="op">&lt;</span><span class="co">----- select all </span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> <span class="kw">sample</span> <span class="op">&lt;</span><span class="co">----- select from this dataframe</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="kw">LIMIT</span> <span class="dv">10</span> <span class="op">&lt;</span><span class="co">----- for demo purposes, limit output to 10 rows</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>You can run these commands in r using the following syntax. Since you can’t run the sql commands in quarto without compiling, I’ve used this method to check that my sql commands actually work.</p>
 <div class="cell" data-hash="SQL-published-version_cache/html/r-to-sql_d63770b88792aa3af8b0d53505abb85b">
