@@ -112,14 +112,14 @@ FROM sample
 
 Here's a more advanced query where we select rows where `var_1` $> 10$
 
-```{sql, connection = "mydb"}
+```{sql, connection = "mydb", eval = F}
 SELECT x1, x2
 FROM sample
 WHERE x2 >= 10
 ```
 
-```{r see above query, eval = T}
-#| connection: mydb
+```{r see above query, connection = "mydb", eval = F}
+mydb <- dbConnect(RSQLite::SQLite(), "sample.sqlite")
 
 dbGetQuery(mydb,'
   select "x1","x2"

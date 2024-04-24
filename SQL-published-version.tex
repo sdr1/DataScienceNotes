@@ -1,0 +1,1306 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+\PassOptionsToPackage{dvipsnames,svgnames,x11names}{xcolor}
+%
+\documentclass[
+  letterpaper,
+  DIV=11,
+  numbers=noendperiod]{scrreprt}
+
+\usepackage{amsmath,amssymb}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math}
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+\usepackage{lmodern}
+\ifPDFTeX\else  
+    % xetex/luatex font selection
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+% Make \paragraph and \subparagraph free-standing
+\ifx\paragraph\undefined\else
+  \let\oldparagraph\paragraph
+  \renewcommand{\paragraph}[1]{\oldparagraph{#1}\mbox{}}
+\fi
+\ifx\subparagraph\undefined\else
+  \let\oldsubparagraph\subparagraph
+  \renewcommand{\subparagraph}[1]{\oldsubparagraph{#1}\mbox{}}
+\fi
+
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{241,243,245}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.68,0.00,0.00}{#1}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.37,0.37,0.37}{#1}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.40,0.45,0.13}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.68,0.00,0.00}{#1}}
+\newcommand{\BuiltInTok}[1]{\textcolor[rgb]{0.00,0.23,0.31}{#1}}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.13,0.47,0.30}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.37,0.37,0.37}{#1}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.37,0.37,0.37}{\textit{#1}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.00,0.23,0.31}{#1}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.68,0.00,0.00}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.68,0.00,0.00}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.37,0.37,0.37}{\textit{#1}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.68,0.00,0.00}{#1}}
+\newcommand{\ExtensionTok}[1]{\textcolor[rgb]{0.00,0.23,0.31}{#1}}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.68,0.00,0.00}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.28,0.35,0.67}{#1}}
+\newcommand{\ImportTok}[1]{\textcolor[rgb]{0.00,0.46,0.62}{#1}}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.37,0.37,0.37}{#1}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.00,0.23,0.31}{#1}}
+\newcommand{\NormalTok}[1]{\textcolor[rgb]{0.00,0.23,0.31}{#1}}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.37,0.37,0.37}{#1}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.00,0.23,0.31}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.68,0.00,0.00}{#1}}
+\newcommand{\RegionMarkerTok}[1]{\textcolor[rgb]{0.00,0.23,0.31}{#1}}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.37,0.37,0.37}{#1}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.13,0.47,0.30}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.13,0.47,0.30}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.07,0.07,0.07}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.13,0.47,0.30}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.37,0.37,0.37}{\textit{#1}}}
+
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}\usepackage{longtable,booktabs,array}
+\usepackage{calc} % for calculating minipage widths
+% Correct order of tables after \paragraph or \subparagraph
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd\longtable{\par}{\if@noskipsec\mbox{}\fi\par}{}{}
+\makeatother
+% Allow footnotes in longtable head/foot
+\IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
+\makesavenoteenv{longtable}
+\usepackage{graphicx}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+% Set default figure placement to htbp
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+
+\usepackage{makeidx}
+\makeindex
+\KOMAoption{captions}{tableheading}
+\makeatletter
+\makeatother
+\makeatletter
+\makeatother
+\makeatletter
+\@ifpackageloaded{caption}{}{\usepackage{caption}}
+\AtBeginDocument{%
+\ifdefined\contentsname
+  \renewcommand*\contentsname{Table of contents}
+\else
+  \newcommand\contentsname{Table of contents}
+\fi
+\ifdefined\listfigurename
+  \renewcommand*\listfigurename{List of Figures}
+\else
+  \newcommand\listfigurename{List of Figures}
+\fi
+\ifdefined\listtablename
+  \renewcommand*\listtablename{List of Tables}
+\else
+  \newcommand\listtablename{List of Tables}
+\fi
+\ifdefined\figurename
+  \renewcommand*\figurename{Figure}
+\else
+  \newcommand\figurename{Figure}
+\fi
+\ifdefined\tablename
+  \renewcommand*\tablename{Table}
+\else
+  \newcommand\tablename{Table}
+\fi
+}
+\@ifpackageloaded{float}{}{\usepackage{float}}
+\floatstyle{ruled}
+\@ifundefined{c@chapter}{\newfloat{codelisting}{h}{lop}}{\newfloat{codelisting}{h}{lop}[chapter]}
+\floatname{codelisting}{Listing}
+\newcommand*\listoflistings{\listof{codelisting}{List of Listings}}
+\makeatother
+\makeatletter
+\@ifpackageloaded{caption}{}{\usepackage{caption}}
+\@ifpackageloaded{subcaption}{}{\usepackage{subcaption}}
+\makeatother
+\makeatletter
+\@ifpackageloaded{tcolorbox}{}{\usepackage[skins,breakable]{tcolorbox}}
+\makeatother
+\makeatletter
+\@ifundefined{shadecolor}{\definecolor{shadecolor}{rgb}{.97, .97, .97}}
+\makeatother
+\makeatletter
+\makeatother
+\makeatletter
+\makeatother
+\ifLuaTeX
+  \usepackage{selnolig}  % disable illegal ligatures
+\fi
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same} % disable monospaced font for URLs
+\hypersetup{
+  pdftitle={SQL},
+  pdfauthor={Steven Rashin},
+  colorlinks=true,
+  linkcolor={blue},
+  filecolor={Maroon},
+  citecolor={Blue},
+  urlcolor={Blue},
+  pdfcreator={LaTeX via pandoc}}
+
+\title{SQL}
+\author{Steven Rashin}
+\date{2024-04-24}
+
+\begin{document}
+\maketitle
+\ifdefined\Shaded\renewenvironment{Shaded}{\begin{tcolorbox}[borderline west={3pt}{0pt}{shadecolor}, boxrule=0pt, enhanced, breakable, frame hidden, sharp corners, interior hidden]}{\end{tcolorbox}}\fi
+
+\hypertarget{preliminaries}{%
+\section{Preliminaries}\label{preliminaries}}
+
+First we're going to create a few datasets using r. The majority of the
+tutorial doesn't use them because the combination of SQL and Quarto is a
+bit buggy but it's a useful exercise anyway.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{library}\NormalTok{(odbc)}
+\FunctionTok{library}\NormalTok{(tidyverse)}
+\FunctionTok{library}\NormalTok{(DBI)}
+\FunctionTok{library}\NormalTok{(here)}
+\FunctionTok{library}\NormalTok{(RSQLite)}
+
+\NormalTok{here}\SpecialCharTok{::}\FunctionTok{i\_am}\NormalTok{(}\StringTok{"SQL{-}published{-}version.qmd"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{sample\_data }\OtherTok{\textless{}{-}} \FunctionTok{tibble}\NormalTok{(}
+  \AttributeTok{id =} \DecValTok{1}\SpecialCharTok{:}\DecValTok{1000}\NormalTok{,}
+  \AttributeTok{x1 =} \FunctionTok{rnorm}\NormalTok{(}\DecValTok{1000}\NormalTok{, }\DecValTok{0}\NormalTok{, }\DecValTok{1}\NormalTok{),}
+  \AttributeTok{x2 =} \FunctionTok{rnorm}\NormalTok{(}\DecValTok{1000}\NormalTok{, }\DecValTok{10}\NormalTok{, }\DecValTok{15}\NormalTok{),}
+  \AttributeTok{y =} \DecValTok{3} \SpecialCharTok{*}\NormalTok{ x1 }\SpecialCharTok{+} \DecValTok{4} \SpecialCharTok{*}\NormalTok{ x2 }\SpecialCharTok{+} \FunctionTok{rnorm}\NormalTok{(}\DecValTok{1000}\NormalTok{, }\DecValTok{0}\NormalTok{, }\DecValTok{10}\NormalTok{),}
+  \AttributeTok{g =} \FunctionTok{rbinom}\NormalTok{(}\DecValTok{1000}\NormalTok{, }\AttributeTok{size =} \DecValTok{1}\NormalTok{, }\AttributeTok{prob =} \FloatTok{0.3}\NormalTok{)}
+\NormalTok{)}
+\NormalTok{sample\_data2 }\OtherTok{\textless{}{-}} \FunctionTok{tibble}\NormalTok{(}
+  \AttributeTok{id =} \DecValTok{1}\SpecialCharTok{:}\DecValTok{1000}\NormalTok{,}
+  \AttributeTok{x3 =} \FunctionTok{rnorm}\NormalTok{(}\DecValTok{1000}\NormalTok{, }\DecValTok{15}\NormalTok{, }\DecValTok{30}\NormalTok{),}
+  \AttributeTok{x4 =} \FunctionTok{rnorm}\NormalTok{(}\DecValTok{1000}\NormalTok{, }\DecValTok{20}\NormalTok{, }\DecValTok{5}\NormalTok{),}
+  \AttributeTok{y2 =} \DecValTok{10} \SpecialCharTok{*}\NormalTok{ x3 }\SpecialCharTok{+} \DecValTok{40} \SpecialCharTok{*}\NormalTok{ x4 }\SpecialCharTok{+} \FunctionTok{rnorm}\NormalTok{(}\DecValTok{1000}\NormalTok{, }\DecValTok{0}\NormalTok{, }\DecValTok{40}\NormalTok{),}
+  \AttributeTok{g2 =} \FunctionTok{rbinom}\NormalTok{(}\DecValTok{1000}\NormalTok{, }\AttributeTok{size =} \DecValTok{1}\NormalTok{, }\AttributeTok{prob =} \FloatTok{0.3}\NormalTok{)}
+\NormalTok{)}
+
+\NormalTok{mydb }\OtherTok{\textless{}{-}} \FunctionTok{dbConnect}\NormalTok{(RSQLite}\SpecialCharTok{::}\FunctionTok{SQLite}\NormalTok{(), }\StringTok{"sample.sqlite"}\NormalTok{)}
+
+\FunctionTok{dbWriteTable}\NormalTok{(}\AttributeTok{conn =}\NormalTok{ mydb, }\AttributeTok{name =} \StringTok{"sample"}\NormalTok{, }\AttributeTok{value =}\NormalTok{ sample\_data, }\AttributeTok{overwrite =}\NormalTok{ T)}
+\FunctionTok{dbWriteTable}\NormalTok{(}\AttributeTok{conn =}\NormalTok{ mydb, }\AttributeTok{name =} \StringTok{"other\_sample"}\NormalTok{, }\AttributeTok{value =}\NormalTok{ sample\_data2, }\AttributeTok{overwrite =}\NormalTok{ T)}
+
+\DocumentationTok{\#\#\#\# Try to load in postgresql {-} doesn\textquotesingle{}t currently work}
+
+\CommentTok{\# https://caltechlibrary.github.io/data{-}carpentry{-}R{-}ecology{-}lesson/05{-}r{-}and{-}databases.html}
+\CommentTok{\# https://jtr13.github.io/cc21fall2/how{-}to{-}integrate{-}r{-}with{-}postgresql.html}
+\CommentTok{\# https://solutions.posit.co/connections/db/databases/postgresql/}
+\CommentTok{\#https://medium.com/geekculture/a{-}simple{-}guide{-}on{-}connecting{-}rstudio{-}to{-}a{-}postgresql{-}database{-}9e35ccdc08be}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{mydb }\OtherTok{\textless{}{-}} \FunctionTok{dbConnect}\NormalTok{(RSQLite}\SpecialCharTok{::}\FunctionTok{SQLite}\NormalTok{(), }\StringTok{"sample.sqlite"}\NormalTok{)}
+
+\FunctionTok{dbListTables}\NormalTok{(mydb) }\CommentTok{\# returns a list of tables in your database}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+[1] "other_sample" "sample"      
+\end{verbatim}
+
+\hypertarget{basic-syntax}{%
+\section{Basic Syntax}\label{basic-syntax}}
+
+The basic syntax is you \texttt{SELECT} variables \texttt{FROM} a
+database.
+
+\[\underbrace{\text{SELECT }}_{\text{Select vars}} \underbrace{\text{*}}_{\text{* is all variables}}\]
+
+\[\underbrace{\text{FROM }}_{\text{from where}} \underbrace{\text{db\_name}}_{\text{name}}\]
+
+See e.g.,
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{SELECT} \OperatorTok{*} \CommentTok{{-}{-}{-}{-}{-} select all }
+\KeywordTok{FROM} \KeywordTok{sample} \CommentTok{{-}{-}{-}{-}{-} select from this dataframe}
+\KeywordTok{LIMIT} \DecValTok{10} \CommentTok{{-}{-}{-}{-}{-} for demo purposes, limit output to 10 rows}
+\end{Highlighting}
+\end{Shaded}
+
+You can run these commands in r using the following syntax. Since you
+can't run the sql commands in quarto without compiling, I've used this
+method to check that my sql commands actually work.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{mydb }\OtherTok{\textless{}{-}} \FunctionTok{dbConnect}\NormalTok{(RSQLite}\SpecialCharTok{::}\FunctionTok{SQLite}\NormalTok{(), }\StringTok{"sample.sqlite"}\NormalTok{)}
+
+\FunctionTok{dbGetQuery}\NormalTok{(mydb,}\StringTok{\textquotesingle{}}
+\StringTok{  select *}
+\StringTok{  from "sample"}
+\StringTok{  limit 10}
+\StringTok{\textquotesingle{}}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+   id         x1         x2          y g
+1   1 -0.6183267  -2.237845   4.429335 1
+2   2  0.6966853  -2.208384  -3.683680 0
+3   3 -0.9733263  21.117396  73.705869 1
+4   4 -0.4735464  -8.064834 -22.659203 0
+5   5 -1.2576574 -13.388658 -64.142352 0
+6   6  2.0352141  21.441742  89.046810 0
+7   7  0.5070065  45.288301 160.481134 0
+8   8 -1.5639607  -6.724773 -28.893768 0
+9   9  0.2531457  11.867015  49.288773 0
+10 10 -2.5613665  22.544334  73.960261 0
+\end{verbatim}
+
+This can be modified (obviously!). Suppose you need two variables,
+\texttt{x1} and \texttt{x2}.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{SELECT}\NormalTok{ x1, x2}
+\KeywordTok{FROM} \KeywordTok{sample}
+\end{Highlighting}
+\end{Shaded}
+
+Here's a more advanced query where we select rows where \texttt{var\_1}
+\(> 10\)
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{SELECT}\NormalTok{ x1, x2}
+\KeywordTok{FROM} \KeywordTok{sample}
+\KeywordTok{WHERE}\NormalTok{ x2 }\OperatorTok{\textgreater{}=} \DecValTok{10}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{mydb }\OtherTok{\textless{}{-}} \FunctionTok{dbConnect}\NormalTok{(RSQLite}\SpecialCharTok{::}\FunctionTok{SQLite}\NormalTok{(), }\StringTok{"sample.sqlite"}\NormalTok{)}
+
+\FunctionTok{dbGetQuery}\NormalTok{(mydb,}\StringTok{\textquotesingle{}}
+\StringTok{  select "x1","x2"}
+\StringTok{  from "sample"}
+\StringTok{  limit 10}
+\StringTok{\textquotesingle{}}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+Often you need summaries or operations by group. This is easy, just add
+the \texttt{GROUP\ BY} clause. Additionally you can perform an operation
+on the groups themselves using \texttt{HAVING}. Below, for example, we
+take the average of variable 1 by group having var2 \textgreater{} 2
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{SELECT} \FunctionTok{avg}\NormalTok{(var1)}
+\KeywordTok{FROM}\NormalTok{ db\_name}
+\KeywordTok{GROUP} \KeywordTok{BY}\NormalTok{ group\_var}
+\KeywordTok{HAVING}\NormalTok{ var2 }\OperatorTok{\textgreater{}} \DecValTok{0}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{mydb }\OtherTok{\textless{}{-}} \FunctionTok{dbConnect}\NormalTok{(RSQLite}\SpecialCharTok{::}\FunctionTok{SQLite}\NormalTok{(), }\StringTok{"sample.sqlite"}\NormalTok{)}
+
+\FunctionTok{dbGetQuery}\NormalTok{(mydb,}\StringTok{\textquotesingle{}}
+\StringTok{  select avg("x1")}
+\StringTok{  from "sample"}
+\StringTok{  group by "g"}
+\StringTok{  having x2 \textgreater{}= 0}
+\StringTok{\textquotesingle{}}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+[1] avg("x1")
+<0 rows> (or 0-length row.names)
+\end{verbatim}
+
+What is the difference? \texttt{HAVING} applies to groups as a whole
+whereas \texttt{WHERE} applies to individual rows. If you have both, the
+\texttt{WHERE} clause is applied first, the \texttt{GROUP\ BY} clause is
+second - so only the individual rows that meet the \texttt{WHERE} clause
+are grouped. The \texttt{HAVING} clause is then applied to the output.
+Then only the groups that meet the \texttt{HAVING} condition will
+appear.
+
+Suppose you need both:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{SELECT} \FunctionTok{AVG}\NormalTok{(var\_3)}
+\KeywordTok{FROM}\NormalTok{ db\_name}
+\KeywordTok{WHERE}\NormalTok{ var1 }\OperatorTok{\textgreater{}=} \DecValTok{10}
+\KeywordTok{GROUP} \KeywordTok{BY}\NormalTok{ group\_var}
+\KeywordTok{HAVING}\NormalTok{ var\_2 }\OperatorTok{\textgreater{}} \DecValTok{5}
+\end{Highlighting}
+\end{Shaded}
+
+Above you'll get the average of variable 3 from \(db\_name\) only for
+the individual rows where \(var\_1\) is greater than 10 grouped by
+group\_var where, within the groups their associated \(var\_2\) value is
+greater than 5.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{mydb }\OtherTok{\textless{}{-}} \FunctionTok{dbConnect}\NormalTok{(RSQLite}\SpecialCharTok{::}\FunctionTok{SQLite}\NormalTok{(), }\StringTok{"sample.sqlite"}\NormalTok{)}
+
+\FunctionTok{dbGetQuery}\NormalTok{(mydb,}\StringTok{\textquotesingle{}}
+\StringTok{  select avg("y")}
+\StringTok{  from "sample"}
+\StringTok{  where "x1" \textgreater{}= 3 }
+\StringTok{  group by "g"}
+\StringTok{  having x2 \textgreater{}= 0}
+\StringTok{\textquotesingle{}}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+  avg("y")
+1 49.22952
+\end{verbatim}
+
+\hypertarget{data-types}{%
+\section{Data types}\label{data-types}}
+
+Here are a few common data types. For a full list go to
+\url{https://www.postgresql.org/docs/current/datatype.html}.
+
+\begin{longtable}[]{@{}ll@{}}
+\caption{Data Types}\tabularnewline
+\toprule\noalign{}
+Data Type & What does it do? \\
+\midrule\noalign{}
+\endfirsthead
+\toprule\noalign{}
+Data Type & What does it do? \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+int & signed four-byte integer \\
+numeric & exact number. use when dealing with money \\
+varchar & variable-length character string \\
+time & time of day (no time zone) \\
+timestamp & date and time (no time zone) \\
+date & calendar date (year, month, day) \\
+\end{longtable}
+
+For a technical discussion of the difference between float4 and float8
+see this post:
+\url{https://stackoverflow.com/questions/16889042/postgresql-what-is-the-difference-between-float1-and-float24}.
+
+\hypertarget{nulls}{%
+\section{NULLS}\label{nulls}}
+
+Use \texttt{IS\ NOT\ NULL} to get rid of nulls. Usually used after the
+\texttt{WHERE} clause.
+
+\hypertarget{aliasing}{%
+\section{Aliasing}\label{aliasing}}
+
+Sometimes you need to alias variables. This is especially necessary when
+merging as you can overwrite columns that have the same name that aren't
+explicitly part of the merge.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{SELECT}\NormalTok{ var }\KeywordTok{AS}\NormalTok{ new\_var\_name}
+\KeywordTok{FROM} \OperatorTok{..}\NormalTok{.}
+\end{Highlighting}
+\end{Shaded}
+
+You can also alias data frames - this is useful when you have multiple
+data frames.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{SELECT}\NormalTok{ var }\KeywordTok{AS}\NormalTok{ new\_var\_name}
+\KeywordTok{FROM}\NormalTok{ df1 a }
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{mydb }\OtherTok{\textless{}{-}} \FunctionTok{dbConnect}\NormalTok{(RSQLite}\SpecialCharTok{::}\FunctionTok{SQLite}\NormalTok{(), }\StringTok{"sample.sqlite"}\NormalTok{)}
+
+\FunctionTok{dbGetQuery}\NormalTok{(mydb,}\StringTok{\textquotesingle{}}
+\StringTok{  select "g" as "group", ROUND(avg("y"),2) as "new\_average"}
+\StringTok{  from "sample" "b"}
+\StringTok{  group by "g"}
+\StringTok{\textquotesingle{}}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+  group new_average
+1     0       39.80
+2     1       37.17
+\end{verbatim}
+
+\hypertarget{converting-data-types}{%
+\section{Converting Data Types}\label{converting-data-types}}
+
+Sometimes the data is in one format and you need it in another. You can
+use \texttt{CAST} to do this
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{CAST}\NormalTok{(variable }\KeywordTok{AS} \DataTypeTok{int}\OperatorTok{/}\DataTypeTok{numeric}\OperatorTok{/}\NormalTok{varcar}\OperatorTok{/}\DataTypeTok{time}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+Sometimes you need to get rid of nulls and coerce them to zeroes, to do
+that use \texttt{COALESCE}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{COALESCE}\NormalTok{(variable, }\DecValTok{0}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{extracting}{%
+\section{Extracting}\label{extracting}}
+
+A lot of times when dealing with dates you'll need a range or only part
+of the information given. To extract this data, you need the command
+\texttt{extract}.
+
+This extracts a year from a date:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{EXTRACT}\NormalTok{(}\DataTypeTok{Year} \KeywordTok{from}\NormalTok{ date\_var)}
+\end{Highlighting}
+\end{Shaded}
+
+This extracts an epoch (i.e.~the time difference) between the end date
+and the start date:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{EXTRACT}\NormalTok{(EPOCH }\KeywordTok{from}\NormalTok{ endvar}\OperatorTok{{-}}\NormalTok{startvar)}
+\end{Highlighting}
+\end{Shaded}
+
+Suppose, however, that you only want the days in the epoch. That's
+surprisingly easy with the following code:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{EXTRACT}\NormalTok{(}\DataTypeTok{Day} \KeywordTok{from}\NormalTok{ endvar}\OperatorTok{{-}}\NormalTok{startvar)}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{sec-aggregate}{%
+\section{Aggregate Functions}\label{sec-aggregate}}
+
+Note that in the table below all of the functions EXCEPT count ignore
+null values.
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.1500}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.8500}}@{}}
+\caption{Aggregate Types}\tabularnewline
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Aggregate Fcn
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+What does it do?
+\end{minipage} \\
+\midrule\noalign{}
+\endfirsthead
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Aggregate Fcn
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+What does it do?
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\texttt{MIN()} & returns the smallest value within the selected
+column \\
+\texttt{MAX()} & returns the largest value within the selected column \\
+\texttt{COUNT()} & returns the number of rows in a set \\
+\texttt{SUM()} & returns the total sum of a numerical column \\
+\texttt{AVG()} & returns the \emph{mean} value of a numerical column.
+Getting the median requires
+\texttt{PERCENTILE\_CONT(0.5)\ WITHIN\ GROUP\ (ORDER\ BY\ var1)}. See
+below for more info \\
+\texttt{GREATEST(var1,\ var2)} & Greatest rowwise among var1 and var2 \\
+\texttt{LEAST(var1,\ var2)} & Least rowwise among var1 and var2 \\
+\end{longtable}
+
+Before we go on, a brief digression on getting the median. For reasons
+known only to the creators of SQL, getting the median is fantastically
+difficult. Suppose you want the median as a decimal rounded to the
+second significant digit. You'd need to write
+\texttt{ROUND(PERCENTILE\_CONT(0.5)\ WITHIN\ GROUP\ (ORDER\ BY\ var1)::DECIMAL,\ 2)}.\footnote{If
+  you ask why, I'll give you my favorite coding answer.}
+
+The functions \texttt{MIN()} to \texttt{AVG()} operate globally but
+sometimes you need the biggest/smallest out of a single record
+(i.e.~locally/within a row). You can do that with \texttt{GREATEST()}
+and \texttt{LEAST()}. Note that these also work on characters. An
+example will help clarify why this feature is useful.
+
+Suppose you want to see the number of flights between a pair of cities
+(e.g.~Austin and Dallas) but you don't care about where the plane
+begins. In this case the command
+\texttt{CONCAT(departure\_city,\ \textquotesingle{}-\textquotesingle{}\ arrival\_city)}\footnote{See
+  Section~\ref{sec-text} for more details} will create \textbf{2}
+separate entries for Austin-Dallas and Dallas-Austin which is not what
+the question asked for. So you have to use \texttt{GREATEST} and
+\texttt{LEAST}.
+
+Greatest gets the highest alphabetically/greatest date/number out of a
+variable PER RECORD (i.e per row). Max gets the most \textbf{OVER ALL
+RECORDS}. Why does this difference matter? Suppose Abilene and Amarillo
+are in the data. Then if you used \texttt{MAX()} every row would be in
+the Abilene and Amarillo group.
+
+Going back to our Dallas/Austin example,
+\texttt{GREATEST(departure\_city,\ arrival\_city)} would give us
+\texttt{Austin} and \texttt{LEAST(departure\_city,\ arrival\_city)}
+gives us \texttt{Dallas} in a row with a flight from Austin to Dallas or
+in a row with a flight from Dallas to Austin. In a row with a flight
+from Austin to London the command would give us \texttt{Austin} and
+\texttt{London}. So to combine these to create a unique ID, we could
+type
+\texttt{CONCAT(GREATEST(destination\_location,\ source\_location),\textquotesingle{}-\textquotesingle{},LEAST(destination\_location,\ source\_location))}
+and that would give us \texttt{Austin-Dallas} whenever the these two
+cities appeared in destination location and source location.
+
+\hypertarget{percentiles}{%
+\subsection{Percentiles}\label{percentiles}}
+
+As you could see from above, extracting the median is difficult. If you
+want a bunch of percentiles, the problem is even worse.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{SELECT} 
+\NormalTok{UNNEST(}\DataTypeTok{array}\NormalTok{[}\DecValTok{0}\NormalTok{, }\FloatTok{0.25}\NormalTok{, }\FloatTok{0.5}\NormalTok{, }\FloatTok{0.75}\NormalTok{, }\DecValTok{1}\NormalTok{]) }\KeywordTok{AS}\NormalTok{ percentile, }
+\NormalTok{UNNEST(}\FunctionTok{PERCENTILE\_CONT}\NormalTok{(}\DataTypeTok{array}\NormalTok{[}\DecValTok{0}\NormalTok{, }\FloatTok{0.25}\NormalTok{, }\FloatTok{0.5}\NormalTok{, }\FloatTok{0.75}\NormalTok{, }\DecValTok{1}\NormalTok{]) within }\KeywordTok{group}\NormalTok{ (}\KeywordTok{order} \KeywordTok{by}\NormalTok{ var1)) }\CommentTok{{-}{-}{-}{-} Note that unnest wraps the whole thing!  }
+\KeywordTok{FROM} \OperatorTok{..}\NormalTok{.}
+\end{Highlighting}
+\end{Shaded}
+
+You have two options for calculating percentiles
+\texttt{PERCENTILE\_CONT} and \texttt{PERCENTILE\_DISC}.
+\texttt{PERCENTILE\_CONT} will interpolate values while
+\texttt{PERCENTILE\_DISC} will give you values only from your data.
+Suppose you have 2,3,4,5. PERCENTILE\_CONT would give you 3.5,
+PERCENTILE\_DISC gives you 3.
+
+\hypertarget{merging}{%
+\section{Merging}\label{merging}}
+
+There are four types of joins:
+
+\begin{itemize}
+\tightlist
+\item
+  INNER JOIN/JOIN
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Joins all common records between tables
+  \end{itemize}
+\item
+  LEFT JOIN
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Joins the matching records in the right frame (i.e.~the one after
+    the LEFT JOIN clause) with all the records in the left frame
+    (i.e.~the one after the FROM clause)
+  \end{itemize}
+\item
+  RIGHT JOIN
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Joins all of the records in the right frame (i.e.~the one after the
+    RIGHT JOIN clause) with all the matching records in the left frame
+    (i.e.~the one after the FROM clause)
+  \end{itemize}
+\item
+  FULL JOIN
+
+  \begin{itemize}
+  \tightlist
+  \item
+    All the records in both frames
+  \end{itemize}
+\end{itemize}
+
+These joins are all on some variable.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{SELECT}\NormalTok{ a.var1, a.var2, a.}\KeywordTok{id}\NormalTok{, b.var3, b.var4, b.id1 }\CommentTok{{-}{-}{-}{-} note the aliases up here.  This is good practice to show where you\textquotesingle{}re getting each variable from}
+\KeywordTok{FROM}\NormalTok{ df1 a }\CommentTok{{-}{-}{-}{-} alias dataframe 1 as a}
+\KeywordTok{INNER} \KeywordTok{JOIN}\NormalTok{ df2 b }\CommentTok{{-}{-}{-}{-}{-} alias dataframe 2 as b}
+\KeywordTok{ON}\NormalTok{ a.}\KeywordTok{id} \OperatorTok{=}\NormalTok{ b.}\KeywordTok{id}
+\end{Highlighting}
+\end{Shaded}
+
+You can use \texttt{OR} in the join to join on either value.
+\texttt{AND} works too.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{SELECT}\NormalTok{ a.var1, a.var2, a.}\KeywordTok{id}\NormalTok{, a.id2, b.var3, b.var4, b.id1, b.alt\_id }\OperatorTok{\textless{}}\CommentTok{{-}{-}{-}{-} note the aliases up here.  This is good practice to show where you\textquotesingle{}re getting each variable from}
+\KeywordTok{FROM}\NormalTok{ df1 a }\OperatorTok{\textless{}}\CommentTok{{-}{-}{-}{-} alias dataframe 1 as a}
+\KeywordTok{INNER} \KeywordTok{JOIN}\NormalTok{ df2 b }\OperatorTok{\textless{}}\CommentTok{{-}{-}{-}{-}{-} alias dataframe 2 as b}
+\KeywordTok{ON}\NormalTok{ a.}\KeywordTok{id} \OperatorTok{=}\NormalTok{ b.}\KeywordTok{id} \KeywordTok{OR}\NormalTok{ a.var1 }\OperatorTok{=}\NormalTok{ b.alt\_id }\OperatorTok{\textless{}}\CommentTok{{-}{-}{-}{-} this joins if EITHER is true}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{itemize}
+\tightlist
+\item
+  UNION
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Concatenates queries. Does not allow duplicates
+  \end{itemize}
+\end{itemize}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{SELECT} \OperatorTok{..}\NormalTok{.}
+\KeywordTok{FROM} \OperatorTok{..}\NormalTok{.}
+\KeywordTok{UNION}
+\KeywordTok{SELECT} \OperatorTok{..}\NormalTok{.}
+\KeywordTok{FROM} \OperatorTok{..}\NormalTok{.}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{itemize}
+\tightlist
+\item
+  UNION ALL
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Concatenates queries. Allows duplicates
+  \end{itemize}
+\end{itemize}
+
+\hypertarget{window-functions}{%
+\section{Window Functions}\label{window-functions}}
+
+Suppose you need to do something within a window like find all flights
+within 3 days. Here you need a window function. The basic syntax is as
+follows:
+
+\(\underbrace{\dots}_{\text{Some fcn}} \text{OVER} (\)
+
+\(\hspace{0.5cm}\underbrace{\text{PARTITION BY} {\color{blue}{\text{var1}}}}_{\text{group by }{\color{blue}{\text{var1}}}}\)
+
+\(\hspace{0.5cm}\underbrace{\text{ORDER BY} {\color{green}{\text{var2}}}}_{\text{order by }{\color{green}{\text{var2}}}}\)
+\() \text{ AS newvar}\)
+
+In addition to the functions in Section~\ref{sec-aggregate}, here are a
+bunch of useful functions. For a more comprehensive list, go to
+\url{https://www.postgresql.org/docs/current/functions-window.html}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.1500}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.8500}}@{}}
+\caption{Window Functions}\tabularnewline
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Window Function
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+What does it do?
+\end{minipage} \\
+\midrule\noalign{}
+\endfirsthead
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Window Function
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+What does it do?
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\texttt{lag()} & lags the data 1, lag(2) would lag 2 rows \\
+\texttt{lead()} & opposite of lag() \\
+\texttt{rank()} & ranks rows. Suppose you have two rows tied for first,
+the rankings would go 1,1,3 \\
+\texttt{dense\_rank()} & ranks rows without skipping.Suppose you have
+two rows tied for first, the rankings would go 1,1,2 \\
+\texttt{ntile()} & splits the data into n groups, indexed by an integer,
+as equally as possible. \texttt{ntile(4)} for example, gives us
+quartiles if ordered properly \\
+\texttt{cume\_dist()} & cumulative distribution \\
+\end{longtable}
+
+\hypertarget{bounding-window-functions}{%
+\subsection{Bounding window functions}\label{bounding-window-functions}}
+
+Sometimes you need to search within a certain \textbf{window} in a group
+as opposed to within an entire group. Suppose we wanted a moving average
+within the last three years. We could do that by properly bounding our
+query. The bounds come after the \texttt{ORDER\ BY} clause.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{SELECT} \FunctionTok{AVG}\NormalTok{(var1) }\KeywordTok{OVER}  \OperatorTok{\textless{}}\CommentTok{{-}{-}{-}{-} give us the mean of variable 1}
+\NormalTok{ (  }
+ \KeywordTok{PARTITION} \KeywordTok{BY}\NormalTok{ country }\OperatorTok{\textless{}}\CommentTok{{-}{-}{-}{-} group by country}
+ \KeywordTok{ORDER} \KeywordTok{BY} \DataTypeTok{year} \KeywordTok{desc} \OperatorTok{\textless{}}\CommentTok{{-}{-}{-}{-} order by year descending}
+ \KeywordTok{ROWS} \KeywordTok{BETWEEN} \DecValTok{2} \KeywordTok{PRECEDING} \KeywordTok{AND} \KeywordTok{CURRENT} \KeywordTok{ROW} \OperatorTok{\textless{}}\CommentTok{{-}{-}{-}{-} gives us the last 3 years.  includes the current row.}
+\NormalTok{)}
+\KeywordTok{FROM}\NormalTok{ df1}
+\end{Highlighting}
+\end{Shaded}
+
+We can be fairly creative with the bounds using the following building
+blocks:
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.3611}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.6389}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Bounds
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+What does it do?
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\texttt{n\ PRECEDING} & 2 Preceding gives us the 2 prior rows not
+including the current row \\
+\texttt{UNBOUND\ PRECEDING} & All rows up to but not including the
+current row \\
+\texttt{CURRENT\ ROW} & Just the current row \\
+\texttt{n\ PRECEDING\ AND\ CURRENT\ ROW} & n preceding and the current
+row \\
+\texttt{n\ FOLLOWING} & n following but not including the current row \\
+\texttt{UNBOUND\ FOLLOWING} & n preceding and the current row \\
+\end{longtable}
+
+\hypertarget{conditionals}{%
+\section{Conditionals}\label{conditionals}}
+
+Sometimes you don't just need an average, you need a conditional average
+or sum. This can be done with the \texttt{FILTER} command
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{sum}\NormalTok{(var) }\KeywordTok{FILTER}\NormalTok{(}\KeywordTok{WHERE} \OperatorTok{..}\NormalTok{.) }\KeywordTok{AS} \OperatorTok{..}\NormalTok{.}
+\end{Highlighting}
+\end{Shaded}
+
+You can create a new variable based on the values of other variables.
+You do that with \texttt{CASE\ WHEN}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ControlFlowTok{CASE} 
+  \ControlFlowTok{WHEN}\NormalTok{ [condition] }\ControlFlowTok{THEN}\NormalTok{ [result]}
+  \ControlFlowTok{WHEN}\NormalTok{ [condition2] }\ControlFlowTok{THEN}\NormalTok{ [result2]}
+  \ControlFlowTok{ELSE}\NormalTok{ [result3] }\ControlFlowTok{END} \KeywordTok{AS}\NormalTok{ new\_conditional\_variable  }
+\end{Highlighting}
+\end{Shaded}
+
+Note that the \texttt{CASE\ WHEN\ ...} can be used in the
+\texttt{GROUP\ BY} command to create groups.
+
+\hypertarget{dates}{%
+\section{Dates}\label{dates}}
+
+Dates are difficult to deal with. You just have to memorize these
+commands.
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.5500}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.4500}}@{}}
+\caption{Datetime Functions}\tabularnewline
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Function
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+What does it do?
+\end{minipage} \\
+\midrule\noalign{}
+\endfirsthead
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Function
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+What does it do?
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\texttt{MAKE\_DATE(year,month,day)} & makes dates \\
+\texttt{MAKE\_TIMESTAMP(year,month,day,\ hour,\ minute,\ second)} &
+makes timestamps \\
+\texttt{MAKE\_INTERVAL(year,month,day,\ hour,\ minute,\ second)} & makes
+intervals \\
+\texttt{DATE(datetime\_var)} & extracts dates from datetimes \\
+\end{longtable}
+
+There are variations. Suppose you wanted to find all processes that
+lasted less than 10 days. You could use the command
+\texttt{MAKE\_INTERVAL(days\ \textless{}\ 10)}
+
+\hypertarget{sec-cte}{%
+\section{Common Table Expressions}\label{sec-cte}}
+
+Sometimes you need to create a separate table that you can then extract
+data from to avoid conflicts like using a window function in the
+\texttt{WHERE} clause. You do this with a common table expression (CTE).
+
+The basic syntax is as follows:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{WITH}\NormalTok{ cte1 }\KeywordTok{AS}\NormalTok{ (}
+\KeywordTok{SELECT} \OperatorTok{..}\NormalTok{.}
+\KeywordTok{FROM}\NormalTok{ db1}
+\NormalTok{)}
+
+\KeywordTok{SELECT} \OperatorTok{..}\NormalTok{.}
+\KeywordTok{FROM} \OperatorTok{..}\NormalTok{. (likely db1 }\KeywordTok{or}\NormalTok{ db2)}
+\end{Highlighting}
+\end{Shaded}
+
+You're not limited to one CTE, you can have multiple if you want:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{WITH}\NormalTok{ RECURSIVE cte1 }\KeywordTok{AS}\NormalTok{ (}
+\KeywordTok{SELECT} \OperatorTok{..}\NormalTok{.}
+\KeywordTok{FROM}\NormalTok{ db1}
+\NormalTok{), }\CommentTok{{-}{-}{-}{-} need the parenthesis and comma here otherwise you get an error!}
+\NormalTok{cte2 }\KeywordTok{AS}\NormalTok{ (}
+\KeywordTok{SELECT} \OperatorTok{..}\NormalTok{.}
+\KeywordTok{FROM}\NormalTok{ db2}
+\NormalTok{)}
+
+\KeywordTok{SELECT} \OperatorTok{..}\NormalTok{.}
+\KeywordTok{FROM} \OperatorTok{..}\NormalTok{. (likely db1 }\KeywordTok{or}\NormalTok{ db2)}
+\end{Highlighting}
+\end{Shaded}
+
+Below is an an example of using CTEs to avoid a window function in the
+\texttt{WHERE} clause.\footnote{See
+  \url{https://www.interviewquery.com/questions/second-longest-flight}
+  for full problem details} The query is from a problem that asks you to
+find the second longest flight between two cities. This is a bit of a
+tricky problem because it requires a window function, concatentaion,
+ordering text strings, and a common table expression.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{WITH}\NormalTok{ tmp }\KeywordTok{AS}\NormalTok{ (}\KeywordTok{SELECT} 
+\KeywordTok{id}\NormalTok{, }
+\NormalTok{destination\_location,}
+\NormalTok{source\_location,}
+\NormalTok{flight\_start,}
+\NormalTok{flight\_end,}
+\FunctionTok{dense\_rank}\NormalTok{() }\KeywordTok{OVER}\NormalTok{ (}
+    \KeywordTok{PARTITION} \KeywordTok{BY} \FunctionTok{CONCAT}\NormalTok{(}\FunctionTok{GREATEST}\NormalTok{(destination\_location, source\_location),}\StringTok{\textquotesingle{}.\textquotesingle{}}\NormalTok{,}\FunctionTok{LEAST}\NormalTok{(destination\_location, source\_location))}
+    \KeywordTok{ORDER} \KeywordTok{BY} \FunctionTok{extract}\NormalTok{(epoch }\KeywordTok{from}\NormalTok{ flight\_end }\OperatorTok{{-}}\NormalTok{ flight\_start) }\KeywordTok{desc}
+\NormalTok{) }\KeywordTok{AS}\NormalTok{ flight\_duration}
+\KeywordTok{FROM}\NormalTok{ flights)}
+
+\KeywordTok{SELECT} \KeywordTok{id}\NormalTok{, destination\_location, source\_location, flight\_start, flight\_end}
+\KeywordTok{FROM}\NormalTok{ tmp}
+\KeywordTok{where}\NormalTok{ flight\_duration }\OperatorTok{=} \DecValTok{2}
+\KeywordTok{order} \KeywordTok{by} \KeywordTok{id}
+\end{Highlighting}
+\end{Shaded}
+
+Let's go through this, starting with the structure. Here we're creating
+a common table expression called cte and then using it
+
+\(\text{WITH } {\color{red}{\text{tmp}}} \text{ AS (} \leftarrow \text{Create CTE called } \color{red}{\text{tmp}}\)\\
+\(\hspace{1cm}\text{SELECT} \dots \leftarrow \text{Standard SQL commands in here}\)\\
+\(\hspace{1cm}\text{FROM} \dots\)\\
+\() \leftarrow \text{Close out CTE}\)
+
+\(\text{SELECT} \dots\)\\
+\(\text{FROM } {\color{red}{\text{tmp}}} \leftarrow \text{Use } {\color{red}{\text{tmp}}} \text{ as a normal table}\)
+
+The other tricky bit is the window function. Here we're using a dense
+rank (i.e.~ranking everything sequentially so if two are tied for first
+the ranks are 1,1,2) by city pair (that's the variable after partition
+by) ordering those groups by flight time descending.
+
+\(\underbrace{\text{dense_rank()}}_{\text{rank everything}} \underbrace{\text{OVER (}}_{\text{create the window}} \\ \underbrace{\text{PARTITION BY}}_{\text{select grouping var}} \hspace{0.2cm}\underbrace{\text{CONCAT(GREATEST(destination_location, source_location),'.',LEAST(destination_location, source_location))}}_{\text{group by city pair}} \\ \underbrace{\text{ORDER BY}}_{\text{select order var(s)}} \hspace{0.2cm}\underbrace{\text{extract(epoch from flight_end - flight_start) desc}}_{\text{order by duration descending}} \\ ) \underbrace{\text{AS flight_duration}}_{\text{Alias this to use later}}\)
+
+\hypertarget{subqueries}{%
+\section{Subqueries}\label{subqueries}}
+
+Suppose you need a one off query within a query. You can use a sub
+query! The basic syntax is below. You can put them anywhere. For
+example, here's one in the \texttt{FROM} clause. Note that you need to
+alias your subqueries or else they'll fail
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{SELECT} \OperatorTok{..}\NormalTok{.}
+\KeywordTok{FROM}\NormalTok{ (}
+  \KeywordTok{SELECT} \OperatorTok{*}
+  \KeywordTok{FROM}\NormalTok{ db1}
+\NormalTok{) }\KeywordTok{AS}\NormalTok{ db2}
+\end{Highlighting}
+\end{Shaded}
+
+You could, however, do one in the \texttt{SELECT} clause if you wanted
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{SELECT}\NormalTok{ (}
+  \KeywordTok{SELECT} \OperatorTok{..}\NormalTok{.}
+  \KeywordTok{FROM} \OperatorTok{..}\NormalTok{.}
+\NormalTok{)}
+\KeywordTok{FROM}\NormalTok{ db1}
+\end{Highlighting}
+\end{Shaded}
+
+So when to use common table expressions versus subtables? Common table
+expressions are, generally, preferred because they're more readable and
+can be used multiple times. See, e.g., below, where we have the same
+query as Section~\ref{sec-cte} but with a subquery instead of a common
+table expression.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{SELECT} 
+\KeywordTok{id}\NormalTok{, }
+\NormalTok{destination\_location,}
+\NormalTok{source\_location,}
+\NormalTok{flight\_start,}
+\NormalTok{flight\_end}
+\KeywordTok{FROM}\NormalTok{ ( }\CommentTok{{-}{-}{-}{-}{-} create a subquery that has everything in the initial dataframe AND a rank}
+    \KeywordTok{SELECT}  \CommentTok{{-}{-}{-}{-} (ctd) column that we can use in a where clause because the subquery }
+    \OperatorTok{*}\NormalTok{,   }\CommentTok{{-}{-}{-}{-}{-} separates the window function from the where so you can just call the }
+\FunctionTok{dense\_rank}\NormalTok{() }\KeywordTok{OVER}\NormalTok{ ( }\CommentTok{{-}{-}{-}{-} duration rank column as usual}
+    \KeywordTok{PARTITION} \KeywordTok{BY} \FunctionTok{CONCAT}\NormalTok{(}\FunctionTok{GREATEST}\NormalTok{(destination\_location, source\_location),}\StringTok{\textquotesingle{}.\textquotesingle{}}\NormalTok{,}\FunctionTok{LEAST}\NormalTok{(destination\_location, source\_location))}
+    \KeywordTok{ORDER} \KeywordTok{BY} \FunctionTok{extract}\NormalTok{(epoch }\KeywordTok{from}\NormalTok{ flight\_end }\OperatorTok{{-}}\NormalTok{ flight\_start) }\KeywordTok{desc}\NormalTok{) }\KeywordTok{AS}\NormalTok{ duration\_rank}
+    \KeywordTok{FROM}\NormalTok{ flights}
+\NormalTok{    ) }\KeywordTok{AS}\NormalTok{ subquery}
+
+\KeywordTok{WHERE}\NormalTok{ duration\_rank }\OperatorTok{=} \DecValTok{2}
+\KeywordTok{order} \KeywordTok{by} \KeywordTok{id}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{subquery-joins}{%
+\subsection{Subquery Joins}\label{subquery-joins}}
+
+Sometimes you need to do something to a database before joining it. Here
+a subquery join is helpful
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{SELECT}\NormalTok{ user\_id, var1, var2 }
+\KeywordTok{FROM}\NormalTok{  db1}
+\KeywordTok{LEFT} \KeywordTok{JOIN} 
+\NormalTok{    ( }\CommentTok{{-}{-}{-}{-} begin subquery }
+        \KeywordTok{SELECT} \KeywordTok{id}\NormalTok{, var3, var4}
+        \KeywordTok{FROM}\NormalTok{ db2}
+        \KeywordTok{WHERE} \OperatorTok{..}\NormalTok{. }\CommentTok{{-}{-}{-}{-}{-}  you\textquotesingle{}re using a subquery because you need to do something so I\textquotesingle{}ve included the where in here }
+\NormalTok{    ) }\KeywordTok{AS}\NormalTok{ a }\CommentTok{{-}{-}{-} end and alias subquery }
+\KeywordTok{ON}\NormalTok{ db1.user\_id }\OperatorTok{=}\NormalTok{ a.}\KeywordTok{id} \CommentTok{{-}{-}{-}{-} join on subquery name!}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{sec-text}{%
+\section{Text}\label{sec-text}}
+
+Sometimes you're faced with a task where you have to concatenate
+(i.e.~join) or split variables. I've seen this problem when trying to
+match pairs of cities for flights when the question only cares about the
+pair and not the ordering.
+
+\(\text{CONCAT(var1, var2)}\)
+
+If you need visual separation between the values, you can always do
+something like:
+
+\(\text{CONCAT(var1, '-', var2)}\)
+
+To undo a split column, use the \texttt{split\_part} clause. Be careful
+here because you need to specify which part of the split you want to
+take!
+
+\(\underbrace{\text{SPLIT\_PART}}_{\text{split apart}}(\underbrace{{\color{red}{\text{var}}, {\color{blue}{\text{'.'}}}, {\color{green}{\text{1}}}}}_{\text{split apart}{\color{red}{\text{ var}}} \text{ on}{\color{blue}{\text{ a period}}} \text{ taking }{\color{green}{\text{the first instance}}} })\)
+
+\hypertarget{random-sample}{%
+\section{Random Sample}\label{random-sample}}
+
+The method below selects 10\% of the data.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{SELECT} \OperatorTok{..}\NormalTok{.}
+\KeywordTok{FROM} \OperatorTok{..}\NormalTok{.}
+\NormalTok{TABLESAMPLE BERNOULLI(}\DecValTok{10}\NormalTok{) }\CommentTok{{-}{-}{-} this is a faster way of sampling}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{summary-statistics}{%
+\section{Summary Statistics}\label{summary-statistics}}
+
+Getting summary statistics is a pain the ass. So here is some code that
+will do it for a variable called \(a\) in database \(t1\). The
+difficulty of the code is that it requires two separate common table
+expressions. Here's a sketch of what that looks like. Note that adding
+RECURSIVE to the with query allows you to select from db1 in the db2
+query.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{WITH}\NormalTok{ RECURSIVE cte1 }\KeywordTok{AS}\NormalTok{ (}
+\KeywordTok{SELECT} \OperatorTok{..}\NormalTok{.}
+\KeywordTok{FROM}\NormalTok{ db1}
+\NormalTok{),}
+\NormalTok{cte2 }\KeywordTok{AS}\NormalTok{ (}
+\KeywordTok{SELECT} \OperatorTok{..}\NormalTok{.}
+\KeywordTok{FROM}\NormalTok{ db2}
+\NormalTok{)}
+
+\KeywordTok{SELECT} \OperatorTok{..}\NormalTok{.}
+\KeywordTok{FROM} \OperatorTok{..}\NormalTok{. (likely db1 }\KeywordTok{or}\NormalTok{ db2)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{WITH}\NormalTok{ RECURSIVE}
+\NormalTok{summary\_stats }\KeywordTok{AS}
+\NormalTok{(}
+ \KeywordTok{SELECT} 
+  \FunctionTok{ROUND}\NormalTok{(}\FunctionTok{AVG}\NormalTok{(a), }\DecValTok{2}\NormalTok{) }\KeywordTok{AS}\NormalTok{ mean,}
+  \FunctionTok{PERCENTILE\_CONT}\NormalTok{(}\FloatTok{0.5}\NormalTok{) WITHIN }\KeywordTok{GROUP}\NormalTok{ (}\KeywordTok{ORDER} \KeywordTok{BY}\NormalTok{ a) }\KeywordTok{AS} \FunctionTok{median}\NormalTok{,}
+  \FunctionTok{MIN}\NormalTok{(a) }\KeywordTok{AS} \FunctionTok{min}\NormalTok{,}
+  \FunctionTok{MAX}\NormalTok{(a) }\KeywordTok{AS} \FunctionTok{max}\NormalTok{,}
+  \FunctionTok{MAX}\NormalTok{(a) }\OperatorTok{{-}} \FunctionTok{MIN}\NormalTok{(a) }\KeywordTok{AS} \KeywordTok{range}\NormalTok{,}
+  \FunctionTok{ROUND}\NormalTok{(}\FunctionTok{STDDEV}\NormalTok{(a), }\DecValTok{2}\NormalTok{) }\KeywordTok{AS}\NormalTok{ standard\_deviation,}
+  \FunctionTok{ROUND}\NormalTok{(}\FunctionTok{VARIANCE}\NormalTok{(a), }\DecValTok{2}\NormalTok{) }\KeywordTok{AS} \FunctionTok{variance}\NormalTok{,}
+  \FunctionTok{PERCENTILE\_CONT}\NormalTok{(}\FloatTok{0.25}\NormalTok{) WITHIN }\KeywordTok{GROUP}\NormalTok{ (}\KeywordTok{ORDER} \KeywordTok{BY}\NormalTok{ a) }\KeywordTok{AS}\NormalTok{ q1,}
+  \FunctionTok{PERCENTILE\_CONT}\NormalTok{(}\FloatTok{0.75}\NormalTok{) WITHIN }\KeywordTok{GROUP}\NormalTok{ (}\KeywordTok{ORDER} \KeywordTok{BY}\NormalTok{ a) }\KeywordTok{AS}\NormalTok{ q3}
+   \KeywordTok{FROM}\NormalTok{ t1}
+\NormalTok{),}
+\NormalTok{row\_summary\_stats }\KeywordTok{AS}
+\NormalTok{(}
+\KeywordTok{SELECT} 
+ \DecValTok{1} \KeywordTok{AS} \KeywordTok{id}\NormalTok{, }
+ \StringTok{\textquotesingle{}mean\textquotesingle{}} \KeywordTok{AS}\NormalTok{ statistic, }
+\NormalTok{ mean }\KeywordTok{AS} \FunctionTok{value} 
+  \KeywordTok{FROM}\NormalTok{ summary\_stats}
+\KeywordTok{union} \KeywordTok{all}
+\KeywordTok{SELECT} 
+ \DecValTok{2}\NormalTok{, }
+ \StringTok{\textquotesingle{}median\textquotesingle{}}\NormalTok{, }
+ \FunctionTok{median} 
+  \KeywordTok{FROM}\NormalTok{ summary\_stats}
+\KeywordTok{UNION}
+\KeywordTok{SELECT} 
+ \DecValTok{3}\NormalTok{, }
+ \StringTok{\textquotesingle{}minimum\textquotesingle{}}\NormalTok{, }
+ \FunctionTok{min} 
+  \KeywordTok{FROM}\NormalTok{ summary\_stats}
+\KeywordTok{UNION}
+\KeywordTok{SELECT} 
+ \DecValTok{4}\NormalTok{, }
+ \StringTok{\textquotesingle{}maximum\textquotesingle{}}\NormalTok{, }
+ \FunctionTok{max} 
+  \KeywordTok{FROM}\NormalTok{ summary\_stats}
+\KeywordTok{UNION}
+\KeywordTok{SELECT} 
+ \DecValTok{5}\NormalTok{, }
+ \StringTok{\textquotesingle{}range\textquotesingle{}}\NormalTok{, }
+ \KeywordTok{range} 
+  \KeywordTok{FROM}\NormalTok{ summary\_stats}
+\KeywordTok{UNION}
+\KeywordTok{SELECT} 
+ \DecValTok{6}\NormalTok{, }
+ \StringTok{\textquotesingle{}standard deviation\textquotesingle{}}\NormalTok{, }
+\NormalTok{ standard\_deviation }
+  \KeywordTok{FROM}\NormalTok{ summary\_stats}
+\KeywordTok{UNION}
+\KeywordTok{SELECT} 
+ \DecValTok{7}\NormalTok{, }
+ \StringTok{\textquotesingle{}variance\textquotesingle{}}\NormalTok{, }
+ \FunctionTok{variance} 
+  \KeywordTok{FROM}\NormalTok{ summary\_stats}
+\KeywordTok{UNION}
+\KeywordTok{SELECT} 
+ \DecValTok{9}\NormalTok{, }
+ \StringTok{\textquotesingle{}Q1\textquotesingle{}}\NormalTok{, }
+\NormalTok{ q1 }
+  \KeywordTok{FROM}\NormalTok{ summary\_stats}
+\KeywordTok{UNION}
+\KeywordTok{SELECT} 
+ \DecValTok{10}\NormalTok{, }
+ \StringTok{\textquotesingle{}Q3\textquotesingle{}}\NormalTok{, }
+\NormalTok{ q3 }
+  \KeywordTok{FROM}\NormalTok{ summary\_stats}
+\KeywordTok{UNION}
+\KeywordTok{SELECT} 
+ \DecValTok{11}\NormalTok{, }
+ \StringTok{\textquotesingle{}IQR\textquotesingle{}}\NormalTok{, }
+\NormalTok{ (q3 }\OperatorTok{{-}}\NormalTok{ q1) }
+  \KeywordTok{FROM}\NormalTok{ summary\_stats}
+\KeywordTok{UNION}
+\KeywordTok{SELECT} 
+ \DecValTok{12}\NormalTok{, }
+ \StringTok{\textquotesingle{}skewness\textquotesingle{}}\NormalTok{, }
+ \FunctionTok{ROUND}\NormalTok{(}\DecValTok{3} \OperatorTok{*}\NormalTok{ (mean }\OperatorTok{{-}} \FunctionTok{median}\NormalTok{):}\CharTok{:NUMERIC} \OperatorTok{/}\NormalTok{ standard\_deviation, }\DecValTok{2}\NormalTok{) }\KeywordTok{AS}\NormalTok{ skewness }
+  \KeywordTok{FROM}\NormalTok{ summary\_stats}
+\NormalTok{)}
+\KeywordTok{SELECT} \OperatorTok{*} 
+ \KeywordTok{FROM}\NormalTok{ row\_summary\_stats}
+  \KeywordTok{ORDER} \KeywordTok{BY} \KeywordTok{id}\NormalTok{;}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{execution-order}{%
+\section{Execution Order}\label{execution-order}}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  JOIN
+
+  \begin{itemize}
+  \tightlist
+  \item
+    If no JOIN, then we start at FROM
+  \end{itemize}
+\item
+  FROM
+\item
+  WHERE
+\item
+  GROUP BY
+\item
+  HAVING
+\item
+  SELECT
+\item
+  DISTINCT
+\item
+  ORDER BY
+\item
+  LIMIT/OFFSET
+\end{enumerate}
+
+\hypertarget{more-efficient-code}{%
+\subsection{More Efficient Code}\label{more-efficient-code}}
+
+\begin{itemize}
+\tightlist
+\item
+  \url{https://nodeteam.medium.com/how-to-optimize-postgresql-queries-226e6ff15f72}
+\item
+  Properly index* columns used in WHERE and JOIN conditions.
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Index will create a pointer to the actual rows in the specified
+    table.
+  \item
+    \url{https://www.postgresql.org/docs/current/sql-createindex.html}
+  \end{itemize}
+\item
+  Use appropriate data types and avoid unnecessary data type
+  conversions.
+\item
+  Limit the use of SELECT * and only retrieve the columns you need.
+\item
+  Minimize the use of subqueries and consider JOIN alternatives.
+\item
+  Monitor and analyze query performance using database-specific tools
+  and profiling.''
+\end{itemize}
+
+
+
+\printindex
+
+\end{document}
