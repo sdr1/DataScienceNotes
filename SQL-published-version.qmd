@@ -74,7 +74,7 @@ mydb <- dbConnect(RSQLite::SQLite(), "sample.sqlite")
 dbListTables(mydb) # returns a list of tables in your database
 ```
 
-## Basic Syntax
+## SELECT, WHERE and Other Basics 
 
 The basic syntax is you `SELECT` variables `FROM` a database.
 
@@ -118,6 +118,8 @@ FROM sample
 WHERE x2 >= 10
 ```
 
+If you need the where to be in a discrete list of things, like selecting actions performed on an iphone or ipad from a database of actions performed on all sorts of devices, then you need `WHERE var in ('condition1','condition2')`
+
 ```{r see above query, connection = "mydb", eval = F}
 mydb <- dbConnect(RSQLite::SQLite(), "sample.sqlite")
 
@@ -128,7 +130,7 @@ dbGetQuery(mydb,'
 ')
 ```
 
-Often you need summaries or operations by group. This is easy, just add the `GROUP BY` clause. Additionally you can perform an operation on the groups themselves using `HAVING`. Below, for example, we take the average of variable 1 by group having var2 \> 2
+Often you need summaries or operations by group. This is easy, just add the `GROUP BY` clause. Additionally you can perform an operation on the groups themselves using `HAVING`. Below, for example, we take the average of variable 1 by group having var2 $> 2$
 
 ```{sql, eval = F}
 SELECT avg(var1)
