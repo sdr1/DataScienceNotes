@@ -25,6 +25,36 @@ format:
         \printindex
 ---
 
+## SQL Workflow
+
+Before we get into anything remotely substantive, we need to discuss how we should approach SQL questions/projects. Without some structure in our approach we're more likely to miss vital parts of the question. First I'll show an example and then I'll explain it.
+
+Suppose we have a question that asks us to take a table of user transactions and output how much a person bought at their last visit to a store. We write in our own words, what the output table should look like after the word 'WANT'. Include any sorting that needs to take place here. Then we list what we have. If we have multiple tables, we'd list multiple tables and their common IDs. Next, we separate the have and want from the map we use to get there. The map is a sketch of the code we'll use but in mostly english with a mix of technical terms.
+
+```{sql, eval = F}
+----- WANT: number of products bought in last visit. 
+----- i.e. user_id, products bought, last visit
+----- SORT BY transaction date earliest to latest
+----- HAVE: user transactions 
+------------
+----- Get count of products bought by transaction date -- 
+----- dense_rank the transaction dates descending -- 
+----- take latest transaction date -- 
+----- do the first in a cte -- 
+----- then use where and select latest 
+
+SELECT ....
+FROM ...
+```
+
+Generically this looks like:
+
+1.  List variable we want
+
+2.  Then list datasets we have
+
+3.  List the steps we need to take to get from 2 to 1.
+
 ## Preliminaries
 
 First we're going to create a few datasets using r. The majority of the tutorial doesn't use them because the combination of SQL and Quarto is a bit buggy but it's a useful exercise anyway.
@@ -74,7 +104,7 @@ mydb <- dbConnect(RSQLite::SQLite(), "sample.sqlite")
 dbListTables(mydb) # returns a list of tables in your database
 ```
 
-## SELECT, WHERE and Other Basics 
+## SELECT, WHERE and Other Basics
 
 The basic syntax is you `SELECT` variables `FROM` a database.
 
@@ -143,7 +173,7 @@ HAVING var2 > 0
 mydb <- dbConnect(RSQLite::SQLite(), "sample.sqlite")
 
 dbGetQuery(mydb,'
-  select avg("x1")
+  select avg("x1") ---- note the quoting needed in the R version not the SQL version
   from "sample"
   group by "g"
   having x2 >= 0
@@ -370,6 +400,16 @@ In addition to the functions in @sec-aggregate, here are a bunch of useful funct
 
 : Window Functions {.striped .hover tbl-colwidths="\[15,85\]"}
 
+```{sql window example, eval = F}
+SELECT lag(var1, 1) OVER  --<---- lag variable 1 
+ (  
+ ---PARTITION BY group_var --<---- if you include a value here, the lag will be within the group
+ ORDER BY date --<---- lag by date globally. 
+)
+FROM df1
+```
+
+
 ### Bounding window functions
 
 Sometimes you need to search within a certain **window** in a group as opposed to within an entire group. Suppose we wanted a moving average within the last three years. We could do that by properly bounding our query. The bounds come after the `ORDER BY` clause.
@@ -568,7 +608,7 @@ If you need visual separation between the values, you can always do something li
 
 $\text{CONCAT(var1, '-', var2)}$
 
-To undo a split column, use the `split_part` clause.  Be careful here because you need to specify which part of the split you want to take!
+To undo a split column, use the `split_part` clause. Be careful here because you need to specify which part of the split you want to take!
 
 $\underbrace{\text{SPLIT\_PART}}_{\text{split apart}}(\underbrace{{\color{red}{\text{var}}, {\color{blue}{\text{'.'}}}, {\color{green}{\text{1}}}}}_{\text{split apart}{\color{red}{\text{ var}}} \text{ on}{\color{blue}{\text{ a period}}} \text{ taking }{\color{green}{\text{the first instance}}} })$
 
