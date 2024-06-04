@@ -409,7 +409,6 @@ SELECT lag(var1, 1) OVER  --<---- lag variable 1
 FROM df1
 ```
 
-
 ### Bounding window functions
 
 Sometimes you need to search within a certain **window** in a group as opposed to within an entire group. Suppose we wanted a moving average within the last three years. We could do that by properly bounding our query. The bounds come after the `ORDER BY` clause.
@@ -536,7 +535,15 @@ $\text{FROM } {\color{red}{\text{tmp}}} \leftarrow \text{Use } {\color{red}{\tex
 
 The other tricky bit is the window function. Here we're using a dense rank (i.e. ranking everything sequentially so if two are tied for first the ranks are 1,1,2) by city pair (that's the variable after partition by) ordering those groups by flight time descending.
 
-$\underbrace{\text{dense_rank()}}_{\text{rank everything}} \underbrace{\text{OVER (}}_{\text{create the window}} \\ \underbrace{\text{PARTITION BY}}_{\text{select grouping var}} \hspace{0.2cm}\underbrace{\text{CONCAT(GREATEST(destination_location, source_location),'.',LEAST(destination_location, source_location))}}_{\text{group by city pair}} \\ \underbrace{\text{ORDER BY}}_{\text{select order var(s)}} \hspace{0.2cm}\underbrace{\text{extract(epoch from flight_end - flight_start) desc}}_{\text{order by duration descending}} \\ ) \underbrace{\text{AS flight_duration}}_{\text{Alias this to use later}}$
+$\underbrace{\text{dense\_rank()}}_{\text{rank everything}} \underbrace{\text{OVER (}}_{\text{create the window}}$ 
+
+$\underbrace{\text{PARTITION BY}}_{\text{select grouping var}} \hspace{0.2cm}\underbrace{\text{CONCAT(GREATEST(destination\_location, source\_location),'.',LEAST(destination\_location, source\_location))}}_{\text{group by city pair}}$
+
+$\underbrace{\text{ORDER BY}}_{\text{select order var(s)}} \hspace{0.2cm}\underbrace{\text{extract(epoch from flight\_end - flight\_start) desc}}_{\text{order by duration descending}}$
+
+$) \hspace{0.2cm} \underbrace{\text{AS flight\_duration}}_{\text{Alias this to use later}}$
+
+
 
 ## Subqueries
 
