@@ -468,6 +468,15 @@ Dates are difficult to deal with. You just have to memorize these commands.
 
 There are variations. Suppose you wanted to find all processes that lasted less than 10 days. You could use the command `MAKE_INTERVAL(days < 10)`
 
+### Extracting Parts of Dates
+| Function                                               | What does it do?              |
+|:-------------------------|:---------------------------------------------|
+| `to_char(trans_date, 'YYYY-MM')`                            | extracts year and month from a variable called trans\_date                |
+| `extract('month' from trans\_date)`                            | extracts month from a variable called trans\_date                 |
+
+
+
+
 ## Common Table Expressions {#sec-cte}
 
 Sometimes you need to create a separate table that you can then extract data from to avoid conflicts like using a window function in the `WHERE` clause. You do this with a common table expression (CTE).

@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Steven Rashin">
-<meta name="dcterms.date" content="2024-06-04">
+<meta name="dcterms.date" content="2024-06-11">
 
 <title>SQL</title>
 <style>
@@ -101,7 +101,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#bounding-window-functions" id="toc-bounding-window-functions" class="nav-link" data-scroll-target="#bounding-window-functions">Bounding window functions</a></li>
   </ul></li>
   <li><a href="#conditionals" id="toc-conditionals" class="nav-link" data-scroll-target="#conditionals">Conditionals</a></li>
-  <li><a href="#dates" id="toc-dates" class="nav-link" data-scroll-target="#dates">Dates</a></li>
+  <li><a href="#dates" id="toc-dates" class="nav-link" data-scroll-target="#dates">Dates</a>
+  <ul class="collapse">
+  <li><a href="#extracting-parts-of-dates" id="toc-extracting-parts-of-dates" class="nav-link" data-scroll-target="#extracting-parts-of-dates">Extracting Parts of Dates</a></li>
+  </ul></li>
   <li><a href="#sec-cte" id="toc-sec-cte" class="nav-link" data-scroll-target="#sec-cte">Common Table Expressions</a></li>
   <li><a href="#subqueries" id="toc-subqueries" class="nav-link" data-scroll-target="#subqueries">Subqueries</a>
   <ul class="collapse">
@@ -138,7 +141,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">June 4, 2024</p>
+      <p class="date">June 11, 2024</p>
     </div>
   </div>
   
@@ -698,6 +701,31 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </tbody>
 </table>
 <p>There are variations. Suppose you wanted to find all processes that lasted less than 10 days. You could use the command <code>MAKE_INTERVAL(days &lt; 10)</code></p>
+<section id="extracting-parts-of-dates" class="level3">
+<h3 class="anchored" data-anchor-id="extracting-parts-of-dates">Extracting Parts of Dates</h3>
+<table class="table">
+<colgroup>
+<col style="width: 36%">
+<col style="width: 63%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Function</th>
+<th style="text-align: left;">What does it do?</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><code>to_char(trans_date, 'YYYY-MM')</code></td>
+<td style="text-align: left;">extracts year and month from a variable called trans_date</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>extract('month' from trans\_date)</code></td>
+<td style="text-align: left;">extracts month from a variable called trans_date</td>
+</tr>
+</tbody>
+</table>
+</section>
 </section>
 <section id="sec-cte" class="level2">
 <h2 class="anchored" data-anchor-id="sec-cte">Common Table Expressions</h2>
