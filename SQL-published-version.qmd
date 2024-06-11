@@ -294,7 +294,7 @@ EXTRACT(Day from endvar-startvar)
 Note that in the table below all of the functions EXCEPT count ignore null values.
 
 | Aggregate Fcn          | What does it do?                                                                                                                                         |
-|:-------------------------|:---------------------------------------------|
+|:-------------------------|:--------------------------------------------|
 | `MIN()`                | returns the smallest value within the selected column                                                                                                    |
 | `MAX()`                | returns the largest value within the selected column                                                                                                     |
 | `COUNT()`              | returns the number of rows in a set                                                                                                                      |
@@ -390,7 +390,7 @@ $\hspace{0.5cm}\underbrace{\text{ORDER BY} {\color{green}{\text{var2}}}}_{\text{
 In addition to the functions in @sec-aggregate, here are a bunch of useful functions. For a more comprehensive list, go to <https://www.postgresql.org/docs/current/functions-window.html>
 
 | Window Function | What does it do?                                                                                                                             |
-|:-------------------------|:---------------------------------------------|
+|:-------------------------|:--------------------------------------------|
 | `lag()`         | lags the data 1, lag(2) would lag 2 rows                                                                                                     |
 | `lead()`        | opposite of lag()                                                                                                                            |
 | `rank()`        | ranks rows. Suppose you have two rows tied for first, the rankings would go 1,1,3                                                            |
@@ -426,7 +426,7 @@ FROM df1
 We can be fairly creative with the bounds using the following building blocks:
 
 | Bounds                        | What does it do?                                                    |
-|:-------------------------|:---------------------------------------------|
+|:-------------------------|:--------------------------------------------|
 | `n PRECEDING`                 | 2 Preceding gives us the 2 prior rows not including the current row |
 | `UNBOUND PRECEDING`           | All rows up to but not including the current row                    |
 | `CURRENT ROW`                 | Just the current row                                                |
@@ -458,7 +458,7 @@ Note that the `CASE WHEN ...` can be used in the `GROUP BY` command to create gr
 Dates are difficult to deal with. You just have to memorize these commands.
 
 | Function                                               | What does it do?              |
-|:-------------------------|:---------------------------------------------|
+|:-------------------------|:--------------------------------------------|
 | `MAKE_DATE(year,month,day)`                            | makes dates                   |
 | `MAKE_TIMESTAMP(year,month,day, hour, minute, second)` | makes timestamps              |
 | `MAKE_INTERVAL(year,month,day, hour, minute, second)`  | makes intervals               |
@@ -469,13 +469,32 @@ Dates are difficult to deal with. You just have to memorize these commands.
 There are variations. Suppose you wanted to find all processes that lasted less than 10 days. You could use the command `MAKE_INTERVAL(days < 10)`
 
 ### Extracting Parts of Dates
-| Function                                               | What does it do?              |
-|:-------------------------|:---------------------------------------------|
-| `to_char(trans_date, 'YYYY-MM')`                            | extracts year and month from a variable called trans\_date                |
-| `extract('month' from trans\_date)`                            | extracts month from a variable called trans\_date                 |
 
+| Function                           | What does it do?                                          |
+|:-------------------------|:--------------------------------------------|
+| `to_char(trans_date, 'YYYY-MM')`   | extracts year and month from a variable called trans_date |
+| `extract('month' from trans_date)` | extracts month from a variable called trans_date          |
 
+: Extracting Datetime Elements {.striped .hover tbl-colwidths="\[55,45\]"}
 
+#### Neat Question
+
+Here's a neat little SQL question that asks you to take a [databse of transactions](https://leetcode.com/problems/monthly-transactions-i/?envType=study-plan-v2&envId=top-sql-50>) and get a count of the number of approved transactions, unapproved transactions, total amount of transactions, total amount of approved transactions while grouping by month and year.  Since it ties the last two sections in nicely, it's worth going over.
+
+Here's the full code:[^1]
+
+[^1]: If you're viewing this in raw markdown (say in R Studio) it won't look like the explanations next to each line of code are comments.  If you render it, they will be.
+
+```{SQL, eval = F}
+SELECT to_char(trans_date, 'YYYY-MM') as month, -- to_char allows us to extract year and month
+country, -- this just gives us country
+count(*) as trans_count, -- count number of members of the group of country and year and month (which is specified in the group command)
+count(country) FILTER(WHERE state = 'approved') as approved_count, --  a conditional count here - gives us the count of all approved transactions 
+sum(amount) AS trans_total_amount, --  gives us sum of all transactions
+sum(amount) FILTER(WHERE state = 'approved')AS approved_total_amount --  conditional sum where we sum amount when the state is approved
+FROM Transactions 
+GROUP BY country, to_char(trans_date, 'YYYY-MM') --  note we only group by country and year-month because we need to extract information about approved and unapprved transactions at this level
+```
 
 ## Common Table Expressions {#sec-cte}
 
@@ -544,15 +563,13 @@ $\text{FROM } {\color{red}{\text{tmp}}} \leftarrow \text{Use } {\color{red}{\tex
 
 The other tricky bit is the window function. Here we're using a dense rank (i.e. ranking everything sequentially so if two are tied for first the ranks are 1,1,2) by city pair (that's the variable after partition by) ordering those groups by flight time descending.
 
-$\underbrace{\text{dense\_rank()}}_{\text{rank everything}} \underbrace{\text{OVER (}}_{\text{create the window}}$ 
+$\underbrace{\text{dense\_rank()}}_{\text{rank everything}} \underbrace{\text{OVER (}}_{\text{create the window}}$
 
 $\underbrace{\text{PARTITION BY}}_{\text{select grouping var}} \hspace{0.2cm}\underbrace{\text{CONCAT(GREATEST(destination\_location, source\_location),'.',LEAST(destination\_location, source\_location))}}_{\text{group by city pair}}$
 
 $\underbrace{\text{ORDER BY}}_{\text{select order var(s)}} \hspace{0.2cm}\underbrace{\text{extract(epoch from flight\_end - flight\_start) desc}}_{\text{order by duration descending}}$
 
 $) \hspace{0.2cm} \underbrace{\text{AS flight\_duration}}_{\text{Alias this to use later}}$
-
-
 
 ## Subqueries
 

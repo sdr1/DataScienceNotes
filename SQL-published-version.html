@@ -703,10 +703,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>There are variations. Suppose you wanted to find all processes that lasted less than 10 days. You could use the command <code>MAKE_INTERVAL(days &lt; 10)</code></p>
 <section id="extracting-parts-of-dates" class="level3">
 <h3 class="anchored" data-anchor-id="extracting-parts-of-dates">Extracting Parts of Dates</h3>
-<table class="table">
+<table class="table-striped table-hover table">
+<caption>Extracting Datetime Elements</caption>
 <colgroup>
-<col style="width: 36%">
-<col style="width: 63%">
+<col style="width: 55%">
+<col style="width: 45%">
 </colgroup>
 <thead>
 <tr class="header">
@@ -720,11 +721,26 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td style="text-align: left;">extracts year and month from a variable called trans_date</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;"><code>extract('month' from trans\_date)</code></td>
+<td style="text-align: left;"><code>extract('month' from trans_date)</code></td>
 <td style="text-align: left;">extracts month from a variable called trans_date</td>
 </tr>
 </tbody>
 </table>
+<section id="neat-question" class="level4">
+<h4 class="anchored" data-anchor-id="neat-question">Neat Question</h4>
+<p>Here’s a neat little SQL question that asks you to take a <a href="https://leetcode.com/problems/monthly-transactions-i/?envType=study-plan-v2&amp;envId=top-sql-50%3E">databse of transactions</a> and get a count of the number of approved transactions, unapproved transactions, total amount of transactions, total amount of approved transactions while grouping by month and year. Since it ties the last two sections in nicely, it’s worth going over.</p>
+<p>Here’s the full code:<a href="#fn3" class="footnote-ref" id="fnref3" role="doc-noteref"><sup>3</sup></a></p>
+<div class="cell" data-hash="SQL-published-version_cache/html/unnamed-chunk-18_b1d1808636f7d20216885d3337550133">
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="fu">to_char</span>(trans_date, <span class="st">'YYYY-MM'</span>) <span class="kw">as</span> <span class="dt">month</span>, <span class="co">-- to_char allows us to extract year and month</span></span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>country, <span class="co">-- this just gives us country</span></span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a><span class="fu">count</span>(<span class="op">*</span>) <span class="kw">as</span> trans_count, <span class="co">-- count number of members of the group of country and year and month (which is specified in the group command)</span></span>
+<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a><span class="fu">count</span>(country) <span class="kw">FILTER</span>(<span class="kw">WHERE</span> state <span class="op">=</span> <span class="st">'approved'</span>) <span class="kw">as</span> approved_count, <span class="co">--  a conditional count here - gives us the count of all approved transactions </span></span>
+<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a><span class="fu">sum</span>(amount) <span class="kw">AS</span> trans_total_amount, <span class="co">--  gives us sum of all transactions</span></span>
+<span id="cb35-6"><a href="#cb35-6" aria-hidden="true" tabindex="-1"></a><span class="fu">sum</span>(amount) <span class="kw">FILTER</span>(<span class="kw">WHERE</span> state <span class="op">=</span> <span class="st">'approved'</span>)<span class="kw">AS</span> approved_total_amount <span class="co">--  conditional sum where we sum amount when the state is approved</span></span>
+<span id="cb35-7"><a href="#cb35-7" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> Transactions </span>
+<span id="cb35-8"><a href="#cb35-8" aria-hidden="true" tabindex="-1"></a><span class="kw">GROUP</span> <span class="kw">BY</span> country, <span class="fu">to_char</span>(trans_date, <span class="st">'YYYY-MM'</span>) <span class="co">--  note we only group by country and year-month because we need to extract information about approved and unapprved transactions at this level</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
 </section>
 </section>
 <section id="sec-cte" class="level2">
@@ -732,46 +748,46 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>Sometimes you need to create a separate table that you can then extract data from to avoid conflicts like using a window function in the <code>WHERE</code> clause. You do this with a common table expression (CTE).</p>
 <p>The basic syntax is as follows:</p>
 <div class="cell" data-hash="SQL-published-version_cache/html/cte-plain_20d18442a326021fdfda73bd78a663e6">
-<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="kw">WITH</span> cte1 <span class="kw">AS</span> (</span>
-<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="op">..</span>.</span>
-<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> db1</span>
-<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb35-6"><a href="#cb35-6" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="op">..</span>.</span>
-<span id="cb35-7"><a href="#cb35-7" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> <span class="op">..</span>. (likely db1 <span class="kw">or</span> db2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="kw">WITH</span> cte1 <span class="kw">AS</span> (</span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="op">..</span>.</span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> db1</span>
+<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb36-6"><a href="#cb36-6" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="op">..</span>.</span>
+<span id="cb36-7"><a href="#cb36-7" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> <span class="op">..</span>. (likely db1 <span class="kw">or</span> db2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>You’re not limited to one CTE, you can have multiple if you want:</p>
 <div class="cell" data-hash="SQL-published-version_cache/html/ctwx2_c50514b62517cf257db90abe353533ac">
-<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="kw">WITH</span> RECURSIVE cte1 <span class="kw">AS</span> (</span>
-<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="op">..</span>.</span>
-<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> db1</span>
-<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a>), <span class="co">---- need the parenthesis and comma here otherwise you get an error!</span></span>
-<span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a>cte2 <span class="kw">AS</span> (</span>
-<span id="cb36-6"><a href="#cb36-6" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="op">..</span>.</span>
-<span id="cb36-7"><a href="#cb36-7" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> db2</span>
-<span id="cb36-8"><a href="#cb36-8" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb36-9"><a href="#cb36-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb36-10"><a href="#cb36-10" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="op">..</span>.</span>
-<span id="cb36-11"><a href="#cb36-11" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> <span class="op">..</span>. (likely db1 <span class="kw">or</span> db2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="kw">WITH</span> RECURSIVE cte1 <span class="kw">AS</span> (</span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="op">..</span>.</span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> db1</span>
+<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a>), <span class="co">---- need the parenthesis and comma here otherwise you get an error!</span></span>
+<span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a>cte2 <span class="kw">AS</span> (</span>
+<span id="cb37-6"><a href="#cb37-6" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="op">..</span>.</span>
+<span id="cb37-7"><a href="#cb37-7" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> db2</span>
+<span id="cb37-8"><a href="#cb37-8" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb37-9"><a href="#cb37-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-10"><a href="#cb37-10" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="op">..</span>.</span>
+<span id="cb37-11"><a href="#cb37-11" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> <span class="op">..</span>. (likely db1 <span class="kw">or</span> db2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>Below is an an example of using CTEs to avoid a window function in the <code>WHERE</code> clause.<a href="#fn3" class="footnote-ref" id="fnref3" role="doc-noteref"><sup>3</sup></a> The query is from a problem that asks you to find the second longest flight between two cities. This is a bit of a tricky problem because it requires a window function, concatentaion, ordering text strings, and a common table expression.</p>
-<div class="cell" data-hash="SQL-published-version_cache/html/unnamed-chunk-18_22c8f2a3e51861b3aefbaa72ba69a620">
-<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="kw">WITH</span> tmp <span class="kw">AS</span> (<span class="kw">SELECT</span> </span>
-<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a><span class="kw">id</span>, </span>
-<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>destination_location,</span>
-<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a>source_location,</span>
-<span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a>flight_start,</span>
-<span id="cb37-6"><a href="#cb37-6" aria-hidden="true" tabindex="-1"></a>flight_end,</span>
-<span id="cb37-7"><a href="#cb37-7" aria-hidden="true" tabindex="-1"></a><span class="fu">dense_rank</span>() <span class="kw">OVER</span> (</span>
-<span id="cb37-8"><a href="#cb37-8" aria-hidden="true" tabindex="-1"></a>    <span class="kw">PARTITION</span> <span class="kw">BY</span> <span class="fu">CONCAT</span>(<span class="fu">GREATEST</span>(destination_location, source_location),<span class="st">'.'</span>,<span class="fu">LEAST</span>(destination_location, source_location))</span>
-<span id="cb37-9"><a href="#cb37-9" aria-hidden="true" tabindex="-1"></a>    <span class="kw">ORDER</span> <span class="kw">BY</span> <span class="fu">extract</span>(epoch <span class="kw">from</span> flight_end <span class="op">-</span> flight_start) <span class="kw">desc</span></span>
-<span id="cb37-10"><a href="#cb37-10" aria-hidden="true" tabindex="-1"></a>) <span class="kw">AS</span> flight_duration</span>
-<span id="cb37-11"><a href="#cb37-11" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> flights)</span>
-<span id="cb37-12"><a href="#cb37-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb37-13"><a href="#cb37-13" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="kw">id</span>, destination_location, source_location, flight_start, flight_end</span>
-<span id="cb37-14"><a href="#cb37-14" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> tmp</span>
-<span id="cb37-15"><a href="#cb37-15" aria-hidden="true" tabindex="-1"></a><span class="kw">where</span> flight_duration <span class="op">=</span> <span class="dv">2</span></span>
-<span id="cb37-16"><a href="#cb37-16" aria-hidden="true" tabindex="-1"></a><span class="kw">order</span> <span class="kw">by</span> <span class="kw">id</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Below is an an example of using CTEs to avoid a window function in the <code>WHERE</code> clause.<a href="#fn4" class="footnote-ref" id="fnref4" role="doc-noteref"><sup>4</sup></a> The query is from a problem that asks you to find the second longest flight between two cities. This is a bit of a tricky problem because it requires a window function, concatentaion, ordering text strings, and a common table expression.</p>
+<div class="cell" data-hash="SQL-published-version_cache/html/unnamed-chunk-19_a379975ebbe4e5ffda3fc4c043c59a1b">
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="kw">WITH</span> tmp <span class="kw">AS</span> (<span class="kw">SELECT</span> </span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a><span class="kw">id</span>, </span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a>destination_location,</span>
+<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a>source_location,</span>
+<span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a>flight_start,</span>
+<span id="cb38-6"><a href="#cb38-6" aria-hidden="true" tabindex="-1"></a>flight_end,</span>
+<span id="cb38-7"><a href="#cb38-7" aria-hidden="true" tabindex="-1"></a><span class="fu">dense_rank</span>() <span class="kw">OVER</span> (</span>
+<span id="cb38-8"><a href="#cb38-8" aria-hidden="true" tabindex="-1"></a>    <span class="kw">PARTITION</span> <span class="kw">BY</span> <span class="fu">CONCAT</span>(<span class="fu">GREATEST</span>(destination_location, source_location),<span class="st">'.'</span>,<span class="fu">LEAST</span>(destination_location, source_location))</span>
+<span id="cb38-9"><a href="#cb38-9" aria-hidden="true" tabindex="-1"></a>    <span class="kw">ORDER</span> <span class="kw">BY</span> <span class="fu">extract</span>(epoch <span class="kw">from</span> flight_end <span class="op">-</span> flight_start) <span class="kw">desc</span></span>
+<span id="cb38-10"><a href="#cb38-10" aria-hidden="true" tabindex="-1"></a>) <span class="kw">AS</span> flight_duration</span>
+<span id="cb38-11"><a href="#cb38-11" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> flights)</span>
+<span id="cb38-12"><a href="#cb38-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-13"><a href="#cb38-13" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="kw">id</span>, destination_location, source_location, flight_start, flight_end</span>
+<span id="cb38-14"><a href="#cb38-14" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> tmp</span>
+<span id="cb38-15"><a href="#cb38-15" aria-hidden="true" tabindex="-1"></a><span class="kw">where</span> flight_duration <span class="op">=</span> <span class="dv">2</span></span>
+<span id="cb38-16"><a href="#cb38-16" aria-hidden="true" tabindex="-1"></a><span class="kw">order</span> <span class="kw">by</span> <span class="kw">id</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Let’s go through this, starting with the structure. Here we’re creating a common table expression called cte and then using it</p>
 <p><span class="math inline">\(\text{WITH } {\color{red}{\text{tmp}}} \text{ AS (} \leftarrow \text{Create CTE called } \color{red}{\text{tmp}}\)</span><br>
@@ -789,54 +805,54 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="subqueries" class="level2">
 <h2 class="anchored" data-anchor-id="subqueries">Subqueries</h2>
 <p>Suppose you need a one off query within a query. You can use a sub query! The basic syntax is below. You can put them anywhere. For example, here’s one in the <code>FROM</code> clause. Note that you need to alias your subqueries or else they’ll fail</p>
-<div class="cell" data-hash="SQL-published-version_cache/html/unnamed-chunk-19_0dcd9e5853782f91c305c1b9617f931a">
-<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="op">..</span>.</span>
-<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> (</span>
-<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a>  <span class="kw">SELECT</span> <span class="op">*</span></span>
-<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a>  <span class="kw">FROM</span> db1</span>
-<span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a>) <span class="kw">AS</span> db2</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell" data-hash="SQL-published-version_cache/html/unnamed-chunk-20_64d987d64b4ec19dd745668bf8da1131">
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="op">..</span>.</span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> (</span>
+<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a>  <span class="kw">SELECT</span> <span class="op">*</span></span>
+<span id="cb39-4"><a href="#cb39-4" aria-hidden="true" tabindex="-1"></a>  <span class="kw">FROM</span> db1</span>
+<span id="cb39-5"><a href="#cb39-5" aria-hidden="true" tabindex="-1"></a>) <span class="kw">AS</span> db2</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>You could, however, do one in the <code>SELECT</code> clause if you wanted</p>
-<div class="cell" data-hash="SQL-published-version_cache/html/unnamed-chunk-20_39dcdd7983445931315fa838cad12f39">
-<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> (</span>
-<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>  <span class="kw">SELECT</span> <span class="op">..</span>.</span>
-<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a>  <span class="kw">FROM</span> <span class="op">..</span>.</span>
-<span id="cb39-4"><a href="#cb39-4" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb39-5"><a href="#cb39-5" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> db1</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell" data-hash="SQL-published-version_cache/html/unnamed-chunk-21_6222a1340144a439d3f4fa35b25e5214">
+<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> (</span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a>  <span class="kw">SELECT</span> <span class="op">..</span>.</span>
+<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a>  <span class="kw">FROM</span> <span class="op">..</span>.</span>
+<span id="cb40-4"><a href="#cb40-4" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb40-5"><a href="#cb40-5" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> db1</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>So when to use common table expressions versus subtables? Common table expressions are, generally, preferred because they’re more readable and can be used multiple times. See, e.g., below, where we have the same query as <a href="#sec-cte">Section&nbsp;14</a> but with a subquery instead of a common table expression.</p>
-<div class="cell" data-hash="SQL-published-version_cache/html/unnamed-chunk-21_54cb913b79989ae2d31526ea50389c8e">
-<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> </span>
-<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a><span class="kw">id</span>, </span>
-<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a>destination_location,</span>
-<span id="cb40-4"><a href="#cb40-4" aria-hidden="true" tabindex="-1"></a>source_location,</span>
-<span id="cb40-5"><a href="#cb40-5" aria-hidden="true" tabindex="-1"></a>flight_start,</span>
-<span id="cb40-6"><a href="#cb40-6" aria-hidden="true" tabindex="-1"></a>flight_end</span>
-<span id="cb40-7"><a href="#cb40-7" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> ( <span class="co">----- create a subquery that has everything in the initial dataframe AND a rank</span></span>
-<span id="cb40-8"><a href="#cb40-8" aria-hidden="true" tabindex="-1"></a>    <span class="kw">SELECT</span>  <span class="co">---- (ctd) column that we can use in a where clause because the subquery </span></span>
-<span id="cb40-9"><a href="#cb40-9" aria-hidden="true" tabindex="-1"></a>    <span class="op">*</span>,   <span class="co">----- separates the window function from the where so you can just call the </span></span>
-<span id="cb40-10"><a href="#cb40-10" aria-hidden="true" tabindex="-1"></a><span class="fu">dense_rank</span>() <span class="kw">OVER</span> ( <span class="co">---- duration rank column as usual</span></span>
-<span id="cb40-11"><a href="#cb40-11" aria-hidden="true" tabindex="-1"></a>    <span class="kw">PARTITION</span> <span class="kw">BY</span> <span class="fu">CONCAT</span>(<span class="fu">GREATEST</span>(destination_location, source_location),<span class="st">'.'</span>,<span class="fu">LEAST</span>(destination_location, source_location))</span>
-<span id="cb40-12"><a href="#cb40-12" aria-hidden="true" tabindex="-1"></a>    <span class="kw">ORDER</span> <span class="kw">BY</span> <span class="fu">extract</span>(epoch <span class="kw">from</span> flight_end <span class="op">-</span> flight_start) <span class="kw">desc</span>) <span class="kw">AS</span> duration_rank</span>
-<span id="cb40-13"><a href="#cb40-13" aria-hidden="true" tabindex="-1"></a>    <span class="kw">FROM</span> flights</span>
-<span id="cb40-14"><a href="#cb40-14" aria-hidden="true" tabindex="-1"></a>    ) <span class="kw">AS</span> subquery</span>
-<span id="cb40-15"><a href="#cb40-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb40-16"><a href="#cb40-16" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> duration_rank <span class="op">=</span> <span class="dv">2</span></span>
-<span id="cb40-17"><a href="#cb40-17" aria-hidden="true" tabindex="-1"></a><span class="kw">order</span> <span class="kw">by</span> <span class="kw">id</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell" data-hash="SQL-published-version_cache/html/unnamed-chunk-22_77c62a1c4bcdd0efa423505cb8b4b432">
+<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> </span>
+<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a><span class="kw">id</span>, </span>
+<span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a>destination_location,</span>
+<span id="cb41-4"><a href="#cb41-4" aria-hidden="true" tabindex="-1"></a>source_location,</span>
+<span id="cb41-5"><a href="#cb41-5" aria-hidden="true" tabindex="-1"></a>flight_start,</span>
+<span id="cb41-6"><a href="#cb41-6" aria-hidden="true" tabindex="-1"></a>flight_end</span>
+<span id="cb41-7"><a href="#cb41-7" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> ( <span class="co">----- create a subquery that has everything in the initial dataframe AND a rank</span></span>
+<span id="cb41-8"><a href="#cb41-8" aria-hidden="true" tabindex="-1"></a>    <span class="kw">SELECT</span>  <span class="co">---- (ctd) column that we can use in a where clause because the subquery </span></span>
+<span id="cb41-9"><a href="#cb41-9" aria-hidden="true" tabindex="-1"></a>    <span class="op">*</span>,   <span class="co">----- separates the window function from the where so you can just call the </span></span>
+<span id="cb41-10"><a href="#cb41-10" aria-hidden="true" tabindex="-1"></a><span class="fu">dense_rank</span>() <span class="kw">OVER</span> ( <span class="co">---- duration rank column as usual</span></span>
+<span id="cb41-11"><a href="#cb41-11" aria-hidden="true" tabindex="-1"></a>    <span class="kw">PARTITION</span> <span class="kw">BY</span> <span class="fu">CONCAT</span>(<span class="fu">GREATEST</span>(destination_location, source_location),<span class="st">'.'</span>,<span class="fu">LEAST</span>(destination_location, source_location))</span>
+<span id="cb41-12"><a href="#cb41-12" aria-hidden="true" tabindex="-1"></a>    <span class="kw">ORDER</span> <span class="kw">BY</span> <span class="fu">extract</span>(epoch <span class="kw">from</span> flight_end <span class="op">-</span> flight_start) <span class="kw">desc</span>) <span class="kw">AS</span> duration_rank</span>
+<span id="cb41-13"><a href="#cb41-13" aria-hidden="true" tabindex="-1"></a>    <span class="kw">FROM</span> flights</span>
+<span id="cb41-14"><a href="#cb41-14" aria-hidden="true" tabindex="-1"></a>    ) <span class="kw">AS</span> subquery</span>
+<span id="cb41-15"><a href="#cb41-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb41-16"><a href="#cb41-16" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> duration_rank <span class="op">=</span> <span class="dv">2</span></span>
+<span id="cb41-17"><a href="#cb41-17" aria-hidden="true" tabindex="-1"></a><span class="kw">order</span> <span class="kw">by</span> <span class="kw">id</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <section id="subquery-joins" class="level3">
 <h3 class="anchored" data-anchor-id="subquery-joins">Subquery Joins</h3>
 <p>Sometimes you need to do something to a database before joining it. Here a subquery join is helpful</p>
 <div class="cell" data-hash="SQL-published-version_cache/html/sub-q-join_4a7a6a85c40ddccffd1fda1fb5ae0caa">
-<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> user_id, var1, var2 </span>
-<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span>  db1</span>
-<span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a><span class="kw">LEFT</span> <span class="kw">JOIN</span> </span>
-<span id="cb41-4"><a href="#cb41-4" aria-hidden="true" tabindex="-1"></a>    ( <span class="co">---- begin subquery </span></span>
-<span id="cb41-5"><a href="#cb41-5" aria-hidden="true" tabindex="-1"></a>        <span class="kw">SELECT</span> <span class="kw">id</span>, var3, var4</span>
-<span id="cb41-6"><a href="#cb41-6" aria-hidden="true" tabindex="-1"></a>        <span class="kw">FROM</span> db2</span>
-<span id="cb41-7"><a href="#cb41-7" aria-hidden="true" tabindex="-1"></a>        <span class="kw">WHERE</span> <span class="op">..</span>. <span class="co">-----  you're using a subquery because you need to do something so I've included the where in here </span></span>
-<span id="cb41-8"><a href="#cb41-8" aria-hidden="true" tabindex="-1"></a>    ) <span class="kw">AS</span> a <span class="co">--- end and alias subquery </span></span>
-<span id="cb41-9"><a href="#cb41-9" aria-hidden="true" tabindex="-1"></a><span class="kw">ON</span> db1.user_id <span class="op">=</span> a.<span class="kw">id</span> <span class="co">---- join on subquery name!</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> user_id, var1, var2 </span>
+<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span>  db1</span>
+<span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a><span class="kw">LEFT</span> <span class="kw">JOIN</span> </span>
+<span id="cb42-4"><a href="#cb42-4" aria-hidden="true" tabindex="-1"></a>    ( <span class="co">---- begin subquery </span></span>
+<span id="cb42-5"><a href="#cb42-5" aria-hidden="true" tabindex="-1"></a>        <span class="kw">SELECT</span> <span class="kw">id</span>, var3, var4</span>
+<span id="cb42-6"><a href="#cb42-6" aria-hidden="true" tabindex="-1"></a>        <span class="kw">FROM</span> db2</span>
+<span id="cb42-7"><a href="#cb42-7" aria-hidden="true" tabindex="-1"></a>        <span class="kw">WHERE</span> <span class="op">..</span>. <span class="co">-----  you're using a subquery because you need to do something so I've included the where in here </span></span>
+<span id="cb42-8"><a href="#cb42-8" aria-hidden="true" tabindex="-1"></a>    ) <span class="kw">AS</span> a <span class="co">--- end and alias subquery </span></span>
+<span id="cb42-9"><a href="#cb42-9" aria-hidden="true" tabindex="-1"></a><span class="kw">ON</span> db1.user_id <span class="op">=</span> a.<span class="kw">id</span> <span class="co">---- join on subquery name!</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 </section>
@@ -853,114 +869,114 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="anchored" data-anchor-id="random-sample">Random Sample</h2>
 <p>The method below selects 10% of the data.</p>
 <div class="cell" data-hash="SQL-published-version_cache/html/random-sample_6ddf9814b7374c4e0a746fbae442f3bf">
-<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="op">..</span>.</span>
-<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> <span class="op">..</span>.</span>
-<span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a>TABLESAMPLE BERNOULLI(<span class="dv">10</span>) <span class="co">--- this is a faster way of sampling</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="op">..</span>.</span>
+<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> <span class="op">..</span>.</span>
+<span id="cb43-3"><a href="#cb43-3" aria-hidden="true" tabindex="-1"></a>TABLESAMPLE BERNOULLI(<span class="dv">10</span>) <span class="co">--- this is a faster way of sampling</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="summary-statistics" class="level2">
 <h2 class="anchored" data-anchor-id="summary-statistics">Summary Statistics</h2>
 <p>Getting summary statistics is a pain the ass. So here is some code that will do it for a variable called <span class="math inline">\(a\)</span> in database <span class="math inline">\(t1\)</span>. The difficulty of the code is that it requires two separate common table expressions. Here’s a sketch of what that looks like. Note that adding RECURSIVE to the with query allows you to select from db1 in the db2 query.</p>
 <div class="cell" data-hash="SQL-published-version_cache/html/show-cte-x2-again_37b634aff2d9c09bf82bd0f1450f6efc">
-<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="kw">WITH</span> RECURSIVE cte1 <span class="kw">AS</span> (</span>
-<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="op">..</span>.</span>
-<span id="cb43-3"><a href="#cb43-3" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> db1</span>
-<span id="cb43-4"><a href="#cb43-4" aria-hidden="true" tabindex="-1"></a>),</span>
-<span id="cb43-5"><a href="#cb43-5" aria-hidden="true" tabindex="-1"></a>cte2 <span class="kw">AS</span> (</span>
-<span id="cb43-6"><a href="#cb43-6" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="op">..</span>.</span>
-<span id="cb43-7"><a href="#cb43-7" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> db2</span>
-<span id="cb43-8"><a href="#cb43-8" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb43-9"><a href="#cb43-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb43-10"><a href="#cb43-10" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="op">..</span>.</span>
-<span id="cb43-11"><a href="#cb43-11" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> <span class="op">..</span>. (likely db1 <span class="kw">or</span> db2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a><span class="kw">WITH</span> RECURSIVE cte1 <span class="kw">AS</span> (</span>
+<span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="op">..</span>.</span>
+<span id="cb44-3"><a href="#cb44-3" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> db1</span>
+<span id="cb44-4"><a href="#cb44-4" aria-hidden="true" tabindex="-1"></a>),</span>
+<span id="cb44-5"><a href="#cb44-5" aria-hidden="true" tabindex="-1"></a>cte2 <span class="kw">AS</span> (</span>
+<span id="cb44-6"><a href="#cb44-6" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="op">..</span>.</span>
+<span id="cb44-7"><a href="#cb44-7" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> db2</span>
+<span id="cb44-8"><a href="#cb44-8" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb44-9"><a href="#cb44-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-10"><a href="#cb44-10" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="op">..</span>.</span>
+<span id="cb44-11"><a href="#cb44-11" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> <span class="op">..</span>. (likely db1 <span class="kw">or</span> db2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell" data-hash="SQL-published-version_cache/html/summary-stats_836d1c7d1c3aef101e42dda720c9f7e2">
-<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a><span class="kw">WITH</span> RECURSIVE</span>
-<span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a>summary_stats <span class="kw">AS</span></span>
-<span id="cb44-3"><a href="#cb44-3" aria-hidden="true" tabindex="-1"></a>(</span>
-<span id="cb44-4"><a href="#cb44-4" aria-hidden="true" tabindex="-1"></a> <span class="kw">SELECT</span> </span>
-<span id="cb44-5"><a href="#cb44-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ROUND</span>(<span class="fu">AVG</span>(a), <span class="dv">2</span>) <span class="kw">AS</span> mean,</span>
-<span id="cb44-6"><a href="#cb44-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">PERCENTILE_CONT</span>(<span class="fl">0.5</span>) WITHIN <span class="kw">GROUP</span> (<span class="kw">ORDER</span> <span class="kw">BY</span> a) <span class="kw">AS</span> <span class="fu">median</span>,</span>
-<span id="cb44-7"><a href="#cb44-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">MIN</span>(a) <span class="kw">AS</span> <span class="fu">min</span>,</span>
-<span id="cb44-8"><a href="#cb44-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">MAX</span>(a) <span class="kw">AS</span> <span class="fu">max</span>,</span>
-<span id="cb44-9"><a href="#cb44-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">MAX</span>(a) <span class="op">-</span> <span class="fu">MIN</span>(a) <span class="kw">AS</span> <span class="kw">range</span>,</span>
-<span id="cb44-10"><a href="#cb44-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ROUND</span>(<span class="fu">STDDEV</span>(a), <span class="dv">2</span>) <span class="kw">AS</span> standard_deviation,</span>
-<span id="cb44-11"><a href="#cb44-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ROUND</span>(<span class="fu">VARIANCE</span>(a), <span class="dv">2</span>) <span class="kw">AS</span> <span class="fu">variance</span>,</span>
-<span id="cb44-12"><a href="#cb44-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">PERCENTILE_CONT</span>(<span class="fl">0.25</span>) WITHIN <span class="kw">GROUP</span> (<span class="kw">ORDER</span> <span class="kw">BY</span> a) <span class="kw">AS</span> q1,</span>
-<span id="cb44-13"><a href="#cb44-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">PERCENTILE_CONT</span>(<span class="fl">0.75</span>) WITHIN <span class="kw">GROUP</span> (<span class="kw">ORDER</span> <span class="kw">BY</span> a) <span class="kw">AS</span> q3</span>
-<span id="cb44-14"><a href="#cb44-14" aria-hidden="true" tabindex="-1"></a>   <span class="kw">FROM</span> t1</span>
-<span id="cb44-15"><a href="#cb44-15" aria-hidden="true" tabindex="-1"></a>),</span>
-<span id="cb44-16"><a href="#cb44-16" aria-hidden="true" tabindex="-1"></a>row_summary_stats <span class="kw">AS</span></span>
-<span id="cb44-17"><a href="#cb44-17" aria-hidden="true" tabindex="-1"></a>(</span>
-<span id="cb44-18"><a href="#cb44-18" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> </span>
-<span id="cb44-19"><a href="#cb44-19" aria-hidden="true" tabindex="-1"></a> <span class="dv">1</span> <span class="kw">AS</span> <span class="kw">id</span>, </span>
-<span id="cb44-20"><a href="#cb44-20" aria-hidden="true" tabindex="-1"></a> <span class="st">'mean'</span> <span class="kw">AS</span> statistic, </span>
-<span id="cb44-21"><a href="#cb44-21" aria-hidden="true" tabindex="-1"></a> mean <span class="kw">AS</span> <span class="fu">value</span> </span>
-<span id="cb44-22"><a href="#cb44-22" aria-hidden="true" tabindex="-1"></a>  <span class="kw">FROM</span> summary_stats</span>
-<span id="cb44-23"><a href="#cb44-23" aria-hidden="true" tabindex="-1"></a><span class="kw">union</span> <span class="kw">all</span></span>
-<span id="cb44-24"><a href="#cb44-24" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> </span>
-<span id="cb44-25"><a href="#cb44-25" aria-hidden="true" tabindex="-1"></a> <span class="dv">2</span>, </span>
-<span id="cb44-26"><a href="#cb44-26" aria-hidden="true" tabindex="-1"></a> <span class="st">'median'</span>, </span>
-<span id="cb44-27"><a href="#cb44-27" aria-hidden="true" tabindex="-1"></a> <span class="fu">median</span> </span>
-<span id="cb44-28"><a href="#cb44-28" aria-hidden="true" tabindex="-1"></a>  <span class="kw">FROM</span> summary_stats</span>
-<span id="cb44-29"><a href="#cb44-29" aria-hidden="true" tabindex="-1"></a><span class="kw">UNION</span></span>
-<span id="cb44-30"><a href="#cb44-30" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> </span>
-<span id="cb44-31"><a href="#cb44-31" aria-hidden="true" tabindex="-1"></a> <span class="dv">3</span>, </span>
-<span id="cb44-32"><a href="#cb44-32" aria-hidden="true" tabindex="-1"></a> <span class="st">'minimum'</span>, </span>
-<span id="cb44-33"><a href="#cb44-33" aria-hidden="true" tabindex="-1"></a> <span class="fu">min</span> </span>
-<span id="cb44-34"><a href="#cb44-34" aria-hidden="true" tabindex="-1"></a>  <span class="kw">FROM</span> summary_stats</span>
-<span id="cb44-35"><a href="#cb44-35" aria-hidden="true" tabindex="-1"></a><span class="kw">UNION</span></span>
-<span id="cb44-36"><a href="#cb44-36" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> </span>
-<span id="cb44-37"><a href="#cb44-37" aria-hidden="true" tabindex="-1"></a> <span class="dv">4</span>, </span>
-<span id="cb44-38"><a href="#cb44-38" aria-hidden="true" tabindex="-1"></a> <span class="st">'maximum'</span>, </span>
-<span id="cb44-39"><a href="#cb44-39" aria-hidden="true" tabindex="-1"></a> <span class="fu">max</span> </span>
-<span id="cb44-40"><a href="#cb44-40" aria-hidden="true" tabindex="-1"></a>  <span class="kw">FROM</span> summary_stats</span>
-<span id="cb44-41"><a href="#cb44-41" aria-hidden="true" tabindex="-1"></a><span class="kw">UNION</span></span>
-<span id="cb44-42"><a href="#cb44-42" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> </span>
-<span id="cb44-43"><a href="#cb44-43" aria-hidden="true" tabindex="-1"></a> <span class="dv">5</span>, </span>
-<span id="cb44-44"><a href="#cb44-44" aria-hidden="true" tabindex="-1"></a> <span class="st">'range'</span>, </span>
-<span id="cb44-45"><a href="#cb44-45" aria-hidden="true" tabindex="-1"></a> <span class="kw">range</span> </span>
-<span id="cb44-46"><a href="#cb44-46" aria-hidden="true" tabindex="-1"></a>  <span class="kw">FROM</span> summary_stats</span>
-<span id="cb44-47"><a href="#cb44-47" aria-hidden="true" tabindex="-1"></a><span class="kw">UNION</span></span>
-<span id="cb44-48"><a href="#cb44-48" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> </span>
-<span id="cb44-49"><a href="#cb44-49" aria-hidden="true" tabindex="-1"></a> <span class="dv">6</span>, </span>
-<span id="cb44-50"><a href="#cb44-50" aria-hidden="true" tabindex="-1"></a> <span class="st">'standard deviation'</span>, </span>
-<span id="cb44-51"><a href="#cb44-51" aria-hidden="true" tabindex="-1"></a> standard_deviation </span>
-<span id="cb44-52"><a href="#cb44-52" aria-hidden="true" tabindex="-1"></a>  <span class="kw">FROM</span> summary_stats</span>
-<span id="cb44-53"><a href="#cb44-53" aria-hidden="true" tabindex="-1"></a><span class="kw">UNION</span></span>
-<span id="cb44-54"><a href="#cb44-54" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> </span>
-<span id="cb44-55"><a href="#cb44-55" aria-hidden="true" tabindex="-1"></a> <span class="dv">7</span>, </span>
-<span id="cb44-56"><a href="#cb44-56" aria-hidden="true" tabindex="-1"></a> <span class="st">'variance'</span>, </span>
-<span id="cb44-57"><a href="#cb44-57" aria-hidden="true" tabindex="-1"></a> <span class="fu">variance</span> </span>
-<span id="cb44-58"><a href="#cb44-58" aria-hidden="true" tabindex="-1"></a>  <span class="kw">FROM</span> summary_stats</span>
-<span id="cb44-59"><a href="#cb44-59" aria-hidden="true" tabindex="-1"></a><span class="kw">UNION</span></span>
-<span id="cb44-60"><a href="#cb44-60" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> </span>
-<span id="cb44-61"><a href="#cb44-61" aria-hidden="true" tabindex="-1"></a> <span class="dv">9</span>, </span>
-<span id="cb44-62"><a href="#cb44-62" aria-hidden="true" tabindex="-1"></a> <span class="st">'Q1'</span>, </span>
-<span id="cb44-63"><a href="#cb44-63" aria-hidden="true" tabindex="-1"></a> q1 </span>
-<span id="cb44-64"><a href="#cb44-64" aria-hidden="true" tabindex="-1"></a>  <span class="kw">FROM</span> summary_stats</span>
-<span id="cb44-65"><a href="#cb44-65" aria-hidden="true" tabindex="-1"></a><span class="kw">UNION</span></span>
-<span id="cb44-66"><a href="#cb44-66" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> </span>
-<span id="cb44-67"><a href="#cb44-67" aria-hidden="true" tabindex="-1"></a> <span class="dv">10</span>, </span>
-<span id="cb44-68"><a href="#cb44-68" aria-hidden="true" tabindex="-1"></a> <span class="st">'Q3'</span>, </span>
-<span id="cb44-69"><a href="#cb44-69" aria-hidden="true" tabindex="-1"></a> q3 </span>
-<span id="cb44-70"><a href="#cb44-70" aria-hidden="true" tabindex="-1"></a>  <span class="kw">FROM</span> summary_stats</span>
-<span id="cb44-71"><a href="#cb44-71" aria-hidden="true" tabindex="-1"></a><span class="kw">UNION</span></span>
-<span id="cb44-72"><a href="#cb44-72" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> </span>
-<span id="cb44-73"><a href="#cb44-73" aria-hidden="true" tabindex="-1"></a> <span class="dv">11</span>, </span>
-<span id="cb44-74"><a href="#cb44-74" aria-hidden="true" tabindex="-1"></a> <span class="st">'IQR'</span>, </span>
-<span id="cb44-75"><a href="#cb44-75" aria-hidden="true" tabindex="-1"></a> (q3 <span class="op">-</span> q1) </span>
-<span id="cb44-76"><a href="#cb44-76" aria-hidden="true" tabindex="-1"></a>  <span class="kw">FROM</span> summary_stats</span>
-<span id="cb44-77"><a href="#cb44-77" aria-hidden="true" tabindex="-1"></a><span class="kw">UNION</span></span>
-<span id="cb44-78"><a href="#cb44-78" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> </span>
-<span id="cb44-79"><a href="#cb44-79" aria-hidden="true" tabindex="-1"></a> <span class="dv">12</span>, </span>
-<span id="cb44-80"><a href="#cb44-80" aria-hidden="true" tabindex="-1"></a> <span class="st">'skewness'</span>, </span>
-<span id="cb44-81"><a href="#cb44-81" aria-hidden="true" tabindex="-1"></a> <span class="fu">ROUND</span>(<span class="dv">3</span> <span class="op">*</span> (mean <span class="op">-</span> <span class="fu">median</span>):<span class="ch">:NUMERIC</span> <span class="op">/</span> standard_deviation, <span class="dv">2</span>) <span class="kw">AS</span> skewness </span>
-<span id="cb44-82"><a href="#cb44-82" aria-hidden="true" tabindex="-1"></a>  <span class="kw">FROM</span> summary_stats</span>
-<span id="cb44-83"><a href="#cb44-83" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb44-84"><a href="#cb44-84" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="op">*</span> </span>
-<span id="cb44-85"><a href="#cb44-85" aria-hidden="true" tabindex="-1"></a> <span class="kw">FROM</span> row_summary_stats</span>
-<span id="cb44-86"><a href="#cb44-86" aria-hidden="true" tabindex="-1"></a>  <span class="kw">ORDER</span> <span class="kw">BY</span> <span class="kw">id</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb45"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="kw">WITH</span> RECURSIVE</span>
+<span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a>summary_stats <span class="kw">AS</span></span>
+<span id="cb45-3"><a href="#cb45-3" aria-hidden="true" tabindex="-1"></a>(</span>
+<span id="cb45-4"><a href="#cb45-4" aria-hidden="true" tabindex="-1"></a> <span class="kw">SELECT</span> </span>
+<span id="cb45-5"><a href="#cb45-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ROUND</span>(<span class="fu">AVG</span>(a), <span class="dv">2</span>) <span class="kw">AS</span> mean,</span>
+<span id="cb45-6"><a href="#cb45-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">PERCENTILE_CONT</span>(<span class="fl">0.5</span>) WITHIN <span class="kw">GROUP</span> (<span class="kw">ORDER</span> <span class="kw">BY</span> a) <span class="kw">AS</span> <span class="fu">median</span>,</span>
+<span id="cb45-7"><a href="#cb45-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">MIN</span>(a) <span class="kw">AS</span> <span class="fu">min</span>,</span>
+<span id="cb45-8"><a href="#cb45-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">MAX</span>(a) <span class="kw">AS</span> <span class="fu">max</span>,</span>
+<span id="cb45-9"><a href="#cb45-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">MAX</span>(a) <span class="op">-</span> <span class="fu">MIN</span>(a) <span class="kw">AS</span> <span class="kw">range</span>,</span>
+<span id="cb45-10"><a href="#cb45-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ROUND</span>(<span class="fu">STDDEV</span>(a), <span class="dv">2</span>) <span class="kw">AS</span> standard_deviation,</span>
+<span id="cb45-11"><a href="#cb45-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ROUND</span>(<span class="fu">VARIANCE</span>(a), <span class="dv">2</span>) <span class="kw">AS</span> <span class="fu">variance</span>,</span>
+<span id="cb45-12"><a href="#cb45-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">PERCENTILE_CONT</span>(<span class="fl">0.25</span>) WITHIN <span class="kw">GROUP</span> (<span class="kw">ORDER</span> <span class="kw">BY</span> a) <span class="kw">AS</span> q1,</span>
+<span id="cb45-13"><a href="#cb45-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">PERCENTILE_CONT</span>(<span class="fl">0.75</span>) WITHIN <span class="kw">GROUP</span> (<span class="kw">ORDER</span> <span class="kw">BY</span> a) <span class="kw">AS</span> q3</span>
+<span id="cb45-14"><a href="#cb45-14" aria-hidden="true" tabindex="-1"></a>   <span class="kw">FROM</span> t1</span>
+<span id="cb45-15"><a href="#cb45-15" aria-hidden="true" tabindex="-1"></a>),</span>
+<span id="cb45-16"><a href="#cb45-16" aria-hidden="true" tabindex="-1"></a>row_summary_stats <span class="kw">AS</span></span>
+<span id="cb45-17"><a href="#cb45-17" aria-hidden="true" tabindex="-1"></a>(</span>
+<span id="cb45-18"><a href="#cb45-18" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> </span>
+<span id="cb45-19"><a href="#cb45-19" aria-hidden="true" tabindex="-1"></a> <span class="dv">1</span> <span class="kw">AS</span> <span class="kw">id</span>, </span>
+<span id="cb45-20"><a href="#cb45-20" aria-hidden="true" tabindex="-1"></a> <span class="st">'mean'</span> <span class="kw">AS</span> statistic, </span>
+<span id="cb45-21"><a href="#cb45-21" aria-hidden="true" tabindex="-1"></a> mean <span class="kw">AS</span> <span class="fu">value</span> </span>
+<span id="cb45-22"><a href="#cb45-22" aria-hidden="true" tabindex="-1"></a>  <span class="kw">FROM</span> summary_stats</span>
+<span id="cb45-23"><a href="#cb45-23" aria-hidden="true" tabindex="-1"></a><span class="kw">union</span> <span class="kw">all</span></span>
+<span id="cb45-24"><a href="#cb45-24" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> </span>
+<span id="cb45-25"><a href="#cb45-25" aria-hidden="true" tabindex="-1"></a> <span class="dv">2</span>, </span>
+<span id="cb45-26"><a href="#cb45-26" aria-hidden="true" tabindex="-1"></a> <span class="st">'median'</span>, </span>
+<span id="cb45-27"><a href="#cb45-27" aria-hidden="true" tabindex="-1"></a> <span class="fu">median</span> </span>
+<span id="cb45-28"><a href="#cb45-28" aria-hidden="true" tabindex="-1"></a>  <span class="kw">FROM</span> summary_stats</span>
+<span id="cb45-29"><a href="#cb45-29" aria-hidden="true" tabindex="-1"></a><span class="kw">UNION</span></span>
+<span id="cb45-30"><a href="#cb45-30" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> </span>
+<span id="cb45-31"><a href="#cb45-31" aria-hidden="true" tabindex="-1"></a> <span class="dv">3</span>, </span>
+<span id="cb45-32"><a href="#cb45-32" aria-hidden="true" tabindex="-1"></a> <span class="st">'minimum'</span>, </span>
+<span id="cb45-33"><a href="#cb45-33" aria-hidden="true" tabindex="-1"></a> <span class="fu">min</span> </span>
+<span id="cb45-34"><a href="#cb45-34" aria-hidden="true" tabindex="-1"></a>  <span class="kw">FROM</span> summary_stats</span>
+<span id="cb45-35"><a href="#cb45-35" aria-hidden="true" tabindex="-1"></a><span class="kw">UNION</span></span>
+<span id="cb45-36"><a href="#cb45-36" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> </span>
+<span id="cb45-37"><a href="#cb45-37" aria-hidden="true" tabindex="-1"></a> <span class="dv">4</span>, </span>
+<span id="cb45-38"><a href="#cb45-38" aria-hidden="true" tabindex="-1"></a> <span class="st">'maximum'</span>, </span>
+<span id="cb45-39"><a href="#cb45-39" aria-hidden="true" tabindex="-1"></a> <span class="fu">max</span> </span>
+<span id="cb45-40"><a href="#cb45-40" aria-hidden="true" tabindex="-1"></a>  <span class="kw">FROM</span> summary_stats</span>
+<span id="cb45-41"><a href="#cb45-41" aria-hidden="true" tabindex="-1"></a><span class="kw">UNION</span></span>
+<span id="cb45-42"><a href="#cb45-42" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> </span>
+<span id="cb45-43"><a href="#cb45-43" aria-hidden="true" tabindex="-1"></a> <span class="dv">5</span>, </span>
+<span id="cb45-44"><a href="#cb45-44" aria-hidden="true" tabindex="-1"></a> <span class="st">'range'</span>, </span>
+<span id="cb45-45"><a href="#cb45-45" aria-hidden="true" tabindex="-1"></a> <span class="kw">range</span> </span>
+<span id="cb45-46"><a href="#cb45-46" aria-hidden="true" tabindex="-1"></a>  <span class="kw">FROM</span> summary_stats</span>
+<span id="cb45-47"><a href="#cb45-47" aria-hidden="true" tabindex="-1"></a><span class="kw">UNION</span></span>
+<span id="cb45-48"><a href="#cb45-48" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> </span>
+<span id="cb45-49"><a href="#cb45-49" aria-hidden="true" tabindex="-1"></a> <span class="dv">6</span>, </span>
+<span id="cb45-50"><a href="#cb45-50" aria-hidden="true" tabindex="-1"></a> <span class="st">'standard deviation'</span>, </span>
+<span id="cb45-51"><a href="#cb45-51" aria-hidden="true" tabindex="-1"></a> standard_deviation </span>
+<span id="cb45-52"><a href="#cb45-52" aria-hidden="true" tabindex="-1"></a>  <span class="kw">FROM</span> summary_stats</span>
+<span id="cb45-53"><a href="#cb45-53" aria-hidden="true" tabindex="-1"></a><span class="kw">UNION</span></span>
+<span id="cb45-54"><a href="#cb45-54" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> </span>
+<span id="cb45-55"><a href="#cb45-55" aria-hidden="true" tabindex="-1"></a> <span class="dv">7</span>, </span>
+<span id="cb45-56"><a href="#cb45-56" aria-hidden="true" tabindex="-1"></a> <span class="st">'variance'</span>, </span>
+<span id="cb45-57"><a href="#cb45-57" aria-hidden="true" tabindex="-1"></a> <span class="fu">variance</span> </span>
+<span id="cb45-58"><a href="#cb45-58" aria-hidden="true" tabindex="-1"></a>  <span class="kw">FROM</span> summary_stats</span>
+<span id="cb45-59"><a href="#cb45-59" aria-hidden="true" tabindex="-1"></a><span class="kw">UNION</span></span>
+<span id="cb45-60"><a href="#cb45-60" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> </span>
+<span id="cb45-61"><a href="#cb45-61" aria-hidden="true" tabindex="-1"></a> <span class="dv">9</span>, </span>
+<span id="cb45-62"><a href="#cb45-62" aria-hidden="true" tabindex="-1"></a> <span class="st">'Q1'</span>, </span>
+<span id="cb45-63"><a href="#cb45-63" aria-hidden="true" tabindex="-1"></a> q1 </span>
+<span id="cb45-64"><a href="#cb45-64" aria-hidden="true" tabindex="-1"></a>  <span class="kw">FROM</span> summary_stats</span>
+<span id="cb45-65"><a href="#cb45-65" aria-hidden="true" tabindex="-1"></a><span class="kw">UNION</span></span>
+<span id="cb45-66"><a href="#cb45-66" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> </span>
+<span id="cb45-67"><a href="#cb45-67" aria-hidden="true" tabindex="-1"></a> <span class="dv">10</span>, </span>
+<span id="cb45-68"><a href="#cb45-68" aria-hidden="true" tabindex="-1"></a> <span class="st">'Q3'</span>, </span>
+<span id="cb45-69"><a href="#cb45-69" aria-hidden="true" tabindex="-1"></a> q3 </span>
+<span id="cb45-70"><a href="#cb45-70" aria-hidden="true" tabindex="-1"></a>  <span class="kw">FROM</span> summary_stats</span>
+<span id="cb45-71"><a href="#cb45-71" aria-hidden="true" tabindex="-1"></a><span class="kw">UNION</span></span>
+<span id="cb45-72"><a href="#cb45-72" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> </span>
+<span id="cb45-73"><a href="#cb45-73" aria-hidden="true" tabindex="-1"></a> <span class="dv">11</span>, </span>
+<span id="cb45-74"><a href="#cb45-74" aria-hidden="true" tabindex="-1"></a> <span class="st">'IQR'</span>, </span>
+<span id="cb45-75"><a href="#cb45-75" aria-hidden="true" tabindex="-1"></a> (q3 <span class="op">-</span> q1) </span>
+<span id="cb45-76"><a href="#cb45-76" aria-hidden="true" tabindex="-1"></a>  <span class="kw">FROM</span> summary_stats</span>
+<span id="cb45-77"><a href="#cb45-77" aria-hidden="true" tabindex="-1"></a><span class="kw">UNION</span></span>
+<span id="cb45-78"><a href="#cb45-78" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> </span>
+<span id="cb45-79"><a href="#cb45-79" aria-hidden="true" tabindex="-1"></a> <span class="dv">12</span>, </span>
+<span id="cb45-80"><a href="#cb45-80" aria-hidden="true" tabindex="-1"></a> <span class="st">'skewness'</span>, </span>
+<span id="cb45-81"><a href="#cb45-81" aria-hidden="true" tabindex="-1"></a> <span class="fu">ROUND</span>(<span class="dv">3</span> <span class="op">*</span> (mean <span class="op">-</span> <span class="fu">median</span>):<span class="ch">:NUMERIC</span> <span class="op">/</span> standard_deviation, <span class="dv">2</span>) <span class="kw">AS</span> skewness </span>
+<span id="cb45-82"><a href="#cb45-82" aria-hidden="true" tabindex="-1"></a>  <span class="kw">FROM</span> summary_stats</span>
+<span id="cb45-83"><a href="#cb45-83" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb45-84"><a href="#cb45-84" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="op">*</span> </span>
+<span id="cb45-85"><a href="#cb45-85" aria-hidden="true" tabindex="-1"></a> <span class="kw">FROM</span> row_summary_stats</span>
+<span id="cb45-86"><a href="#cb45-86" aria-hidden="true" tabindex="-1"></a>  <span class="kw">ORDER</span> <span class="kw">BY</span> <span class="kw">id</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="execution-order" class="level2">
@@ -1000,9 +1016,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div id="quarto-appendix" class="default"><section id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes"><h2 class="anchored quarto-appendix-heading">Footnotes</h2>
 
 <ol>
-<li id="fn1"><p>If you ask why, I’ll give you my favorite coding answer.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn1"><p>If you’re viewing this in raw markdown (say in R Studio) it won’t look like the explanations next to each line of code are comments. If you render it, they will be.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
 <li id="fn2"><p>See <a href="#sec-text">Section&nbsp;16</a> for more details<a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
-<li id="fn3"><p>See <a href="https://www.interviewquery.com/questions/second-longest-flight" class="uri">https://www.interviewquery.com/questions/second-longest-flight</a> for full problem details<a href="#fnref3" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn3"><p>If you’re viewing this in raw markdown (say in R Studio) it won’t look like the explanations next to each line of code are comments. If you render it, they will be.<a href="#fnref3" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn4"><p>See <a href="https://www.interviewquery.com/questions/second-longest-flight" class="uri">https://www.interviewquery.com/questions/second-longest-flight</a> for full problem details<a href="#fnref4" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
 </ol>
 </section></div></main>
 <!-- /main column -->
